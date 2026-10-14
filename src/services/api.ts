@@ -1,13 +1,40 @@
-import { Hospital, CategoryInfo, TreatmentInfo, Lead, SearchCriteria, PatientSchedule, HospitalAccount } from '../types';
-import { supabase } from './supabaseClient';
+import { Hospital, CategoryInfo, TreatmentInfo, Lead, LeadStatus, SearchCriteria, PatientSchedule, HospitalAccount } from '../types';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { INITIAL_HOSPITALS, INITIAL_CATEGORIES, INITIAL_TREATMENTS, INITIAL_LEADS } from '../data/initialData';
 import { INITIAL_HOSPITAL_ACCOUNTS, INITIAL_SCHEDULES, hashPassword, generateRandomTempPassword } from '../data/crmData';
+
+const LOCAL_LEADS_STORAGE_KEY = 'acquire_surgery_leads_cache';
+
+function getInitialLeads(): Lead[] {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem(LOCAL_LEADS_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return [...INITIAL_LEADS];
+}
+
+function saveLocalLeads(leads: Lead[]) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(LOCAL_LEADS_STORAGE_KEY, JSON.stringify(leads));
+    } catch {
+      // ignore
+    }
+  }
+}
 
 // Fallback in-memory client state if offline / fetch fails
 let localHospitals = [...INITIAL_HOSPITALS];
 let localCategories = [...INITIAL_CATEGORIES];
 let localTreatments = [...INITIAL_TREATMENTS];
-let localLeads = [...INITIAL_LEADS];
+let localLeads = getInitialLeads();
 let localHospitalAccounts = [...INITIAL_HOSPITAL_ACCOUNTS];
 let localSchedules = [...INITIAL_SCHEDULES];
 
@@ -184,12 +211,22 @@ export const api = {
   },
 
   async getLeads(): Promise<Lead[]> {
-    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('Error fetching leads:', error);
-      return localLeads;
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+        if (!error && Array.isArray(data)) {
+          localLeads = data;
+          saveLocalLeads(localLeads);
+          return data;
+        }
+        if (error) {
+          console.warn('Supabase getLeads returned error, using local fallback:', error.message || error);
+        }
+      } catch (err) {
+        console.warn('Supabase getLeads exception, using local fallback:', err);
+      }
     }
-    return data || [];
+    return localLeads;
   },
 
   async searchHospitals(criteria: { treatment?: string; budget?: string; location?: string }): Promise<Hospital[]> {
@@ -201,44 +238,94 @@ export const api = {
   },
 
   async createLead(criteria: SearchCriteria & { preferredHospitalId?: string; source?: string; matchedHospitalIds?: string[] }): Promise<{ lead: Lead; matchingCount: number }> {
-    const newLeadData = {
+    const newLeadData: Partial<Lead> = {
       name: criteria.name,
       mobile: criteria.mobile,
       treatment: criteria.treatment,
       budget: criteria.budget,
       city: criteria.city || 'Bangalore',
-      status: 'New Leads',
+      status: 'New Leads' as LeadStatus,
       source: criteria.source || 'Search Tool',
       notes: [`Inquiry submitted for ${criteria.treatment}`]
     };
     
-    const { data, error } = await supabase.from('leads').insert([newLeadData]).select().single();
-    if (error) {
-      console.error('Error creating lead:', error);
-      throw error;
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.from('leads').insert([newLeadData]).select().single();
+        if (!error && data) {
+          localLeads.unshift(data);
+          saveLocalLeads(localLeads);
+          return { lead: data, matchingCount: 0 };
+        }
+        if (error) {
+          console.warn('Supabase createLead failed, falling back to local memory:', error.message || error);
+        }
+      } catch (err) {
+        console.warn('Supabase createLead error, using local state:', err);
+      }
     }
-    return { lead: data, matchingCount: 0 };
+
+    // Local resilient fallback
+    const fallbackLead: Lead = {
+      id: `lead-${Date.now()}`,
+      name: newLeadData.name || 'Patient',
+      mobile: newLeadData.mobile || '',
+      treatment: newLeadData.treatment || 'Consultation',
+      budget: newLeadData.budget || 'Standard',
+      city: newLeadData.city || 'Bangalore',
+      status: (newLeadData.status as LeadStatus) || 'New Leads',
+      source: newLeadData.source || 'Website',
+      notes: newLeadData.notes || [],
+      matchedHospitalIds: criteria.matchedHospitalIds || [],
+      matchedHospitalCount: criteria.matchedHospitalIds?.length || 0,
+      createdAt: new Date().toISOString(),
+    };
+    localLeads.unshift(fallbackLead);
+    saveLocalLeads(localLeads);
+    return { lead: fallbackLead, matchingCount: fallbackLead.matchedHospitalCount };
   },
 
   async updateLead(id: string, updates: { status?: string; assignedRep?: string; note?: string; authorName?: string }): Promise<Lead> {
-    const { data: lead, error: fetchError } = await supabase.from('leads').select('*').eq('id', id).single();
-    if (fetchError) throw fetchError;
+    if (isSupabaseConfigured) {
+      try {
+        const { data: lead, error: fetchError } = await supabase.from('leads').select('*').eq('id', id).single();
+        if (!fetchError && lead) {
+          const newUpdates: any = { ...updates };
+          if (updates.note) {
+            const author = updates.authorName || 'Staff';
+            const timestamp = new Date().toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
+            newUpdates.notes = [...(lead.notes || []), `[${timestamp} by ${author}] ${updates.note}`];
+            delete newUpdates.note;
+            delete newUpdates.authorName;
+          }
 
-    const newUpdates: any = { ...updates };
-    if (updates.note) {
-      const author = updates.authorName || 'Staff';
-      const timestamp = new Date().toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
-      newUpdates.notes = [...(lead.notes || []), `[${timestamp} by ${author}] ${updates.note}`];
-      delete newUpdates.note;
-      delete newUpdates.authorName;
+          const { data, error } = await supabase.from('leads').update(newUpdates).eq('id', id).select().single();
+          if (!error && data) {
+            const idx = localLeads.findIndex(l => l.id === id);
+            if (idx !== -1) localLeads[idx] = data;
+            saveLocalLeads(localLeads);
+            return data;
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase updateLead error, updating local state:', err);
+      }
     }
 
-    const { data, error } = await supabase.from('leads').update(newUpdates).eq('id', id).select().single();
-    if (error) {
-      console.error('Error updating lead:', error);
-      throw error;
+    // Local in-memory fallback
+    const lead = localLeads.find(l => l.id === id);
+    if (lead) {
+      if (updates.status) lead.status = updates.status as LeadStatus;
+      if (updates.assignedRep) lead.assignedRep = updates.assignedRep;
+      if (updates.note) {
+        const author = updates.authorName || 'Staff';
+        const timestamp = new Date().toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
+        lead.notes = [...(lead.notes || []), `[${timestamp} by ${author}] ${updates.note}`];
+      }
+      saveLocalLeads(localLeads);
+      return lead;
     }
-    return data;
+    throw new Error('Lead not found');
   },
 
   // =================== PATIENT SCHEDULING ===================
