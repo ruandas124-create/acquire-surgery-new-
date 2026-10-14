@@ -1,0 +1,5 @@
+{
+  "summary": "SQL script to define or update the 'leads' table in Supabase with the required schema, status constraints, and default values.",
+  "updatedAt": "2026-10-14T04:54:32.226118847Z",
+  "userFacing": true
+}

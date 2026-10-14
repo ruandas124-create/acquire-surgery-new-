@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 230" width="640" height="230" fill="none">
+  <defs>
+    <linearGradient id="leafGradWhite" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="60%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#6EE7B7" />
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap');
+      .acquire-text-white {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 800;
+        font-size: 124px;
+        fill: #FFFFFF;
+        letter-spacing: -2px;
+      }
+      .surgery-text-white {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 700;
+        font-size: 38px;
+        fill: #38BDF8;
+        letter-spacing: 14px;
+      }
+    </style>
+  </defs>
+
+  <g transform="translate(32, 12)">
+    <text x="0" y="132" class="acquire-text-white">Acqu</text>
+    <rect x="318" y="52" width="22" height="80" rx="3" fill="#FFFFFF" />
+    <g transform="translate(329, 28) scale(1.15)">
+      <path 
+        d="M -10,13 C -12,6 -5,-4 9,-21 C 10,-22 12,-22 12,-20 C 13,-4 7,8 -5,16 C -7,17.5 -9.5,16 -10,13 Z" 
+        fill="url(#leafGradWhite)" 
+      />
+    </g>
+    <text x="345" y="132" class="acquire-text-white">re</text>
+    <text x="50" y="195" class="surgery-text-white">SURGERY</text>
+  </g>
+</svg>

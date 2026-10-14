@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        if (typeof window !== 'undefined') {
+          if (!window.IntersectionObserver) {
+            window.IntersectionObserver = function(callback) {
+              this.observe = function(target) {
+                if (typeof callback === 'function') {
+                  try {
+                    callback([{ isIntersecting: true, intersectionRatio: 1, target: target, time: Date.now() }], this);
+                  } catch (e) {}
+                }
+              };
+              this.unobserve = function() {};
+              this.disconnect = function() {};
+              this.takeRecords = function() { return []; };
+            };
+          }
+          if (!window.ResizeObserver) {
+            window.ResizeObserver = function(callback) {
+              this.observe = function(target) {
+                if (typeof callback === 'function') {
+                  try {
+                    callback([{ target: target, contentRect: target.getBoundingClientRect ? target.getBoundingClientRect() : { width: 0, height: 0 } }], this);
+                  } catch (e) {}
+                }
+              };
+              this.unobserve = function() {};
+              this.disconnect = function() {};
+            };
+          }
+          if (typeof window.matchMedia !== 'function') {
+            window.matchMedia = function(q) {
+              return {
+                matches: false,
+                media: q,
+                onchange: null,
+                addListener: function() {},
+                removeListener: function() {},
+                addEventListener: function() {},
+                removeEventListener: function() {},
+                dispatchEvent: function() { return false; }
+              };
+            };
+          }
+          if (typeof window.scrollTo !== 'function') {
+            window.scrollTo = function() {};
+          }
+        }
+      })();
+    </script>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Acquire Surgery - Surgical Care & Hospital Matching in Bangalore</title>
+    <meta name="description" content="Acquire Surgery is a trusted healthcare decision-support platform helping patients find suitable hospitals for surgery and treatment in Bangalore based on medical need and budget." />
+    <meta property="og:title" content="Acquire Surgery - Surgical Care & Hospital Matching in Bangalore" />
+    <meta property="og:description" content="Acquire Surgery is a trusted healthcare decision-support platform helping patients find suitable hospitals for surgery and treatment in Bangalore based on medical need and budget." />
+    <meta property="og:image" content="/logo.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1421652336574892');
+      fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+  </head>
+  <body class="bg-slate-50 text-slate-800 antialiased font-['Plus_Jakarta_Sans',sans-serif]">
+    <!-- Meta Pixel noscript fallback -->
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1421652336574892&ev=PageView&noscript=1"
+    /></noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

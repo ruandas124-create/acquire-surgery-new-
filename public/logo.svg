@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 230" width="640" height="230" fill="none">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="45%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap');
+      .acquire-text {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 800;
+        font-size: 124px;
+        fill: #062B61;
+        letter-spacing: -2px;
+      }
+      .surgery-text {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 700;
+        font-size: 38px;
+        fill: #0097B2;
+        letter-spacing: 14px;
+      }
+    </style>
+  </defs>
+
+  <!-- Background transparent -->
+  <g transform="translate(32, 12)">
+    <!-- "Acqu" text -->
+    <text x="0" y="132" class="acquire-text">Acqu</text>
+
+    <!-- 'i' stem without dot -->
+    <rect x="318" y="52" width="22" height="80" rx="3" fill="#062B61" />
+
+    <!-- Leaf replacing dot of 'i' -->
+    <g transform="translate(329, 28) scale(1.15)">
+      <path 
+        d="M -10,13 C -12,6 -5,-4 9,-21 C 10,-22 12,-22 12,-20 C 13,-4 7,8 -5,16 C -7,17.5 -9.5,16 -10,13 Z" 
+        fill="url(#leafGrad)" 
+      />
+    </g>
+
+    <!-- "re" text -->
+    <text x="345" y="132" class="acquire-text">re</text>
+
+    <!-- "SURGERY" subtitle centered under Acquire -->
+    <text x="50" y="195" class="surgery-text">SURGERY</text>
+  </g>
+</svg>
