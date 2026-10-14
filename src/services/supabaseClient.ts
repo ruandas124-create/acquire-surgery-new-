@@ -1,7 +1,17 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const DEFAULT_SUPABASE_URL = 'https://zfifmfzrzxmbwilcsnhx.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmaWZtZnpyenhtYndpbGNzbmh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5NDk1NDEsImV4cCI6MjEwNzUyNTU0MX0.2-7NB9SoCXG-5BnpwBneKevxZQmjf5F3LQaTEiz2Auk';
+
+const supabaseUrl = 
+  import.meta.env.VITE_SUPABASE_URL || 
+  import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 
+  DEFAULT_SUPABASE_URL;
+
+const supabaseAnonKey = 
+  import.meta.env.VITE_SUPABASE_ANON_KEY || 
+  import.meta.env.SUPABASE_ANON_KEY || 
+  DEFAULT_SUPABASE_ANON_KEY;
 
 // Validates whether Supabase credentials were provided in the build/deployment environment
 export const isSupabaseConfigured = Boolean(
@@ -15,7 +25,7 @@ export const isSupabaseConfigured = Boolean(
   !supabaseUrl.includes('placeholder')
 );
 
-// Safe fallback client builder to prevent top-level runtime crashes when deployed without env vars
+// Safe fallback client builder to prevent top-level runtime crashes
 function createSafeFallbackClient(): any {
   const chainable = () => {
     const obj: any = {
@@ -47,16 +57,19 @@ function createSafeFallbackClient(): any {
 
 let clientInstance: SupabaseClient;
 
-if (isSupabaseConfigured) {
-  try {
-    clientInstance = createClient(supabaseUrl, supabaseAnonKey);
-  } catch (err) {
-    console.warn('Acquire Surgery: Failed to initialize Supabase client, using safe offline fallback.', err);
+try {
+  if (isSupabaseConfigured) {
+    clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    });
+  } else {
     clientInstance = createSafeFallbackClient();
   }
-} else {
-  // Graceful fallback for static deployments (e.g. Vercel) where env vars may not yet be defined
-  console.info('Acquire Surgery: Running with local resilient state (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY not set).');
+} catch (err) {
+  console.warn('Acquire Surgery: Failed to initialize live Supabase client, using safe offline fallback.', err);
   clientInstance = createSafeFallbackClient();
 }
 

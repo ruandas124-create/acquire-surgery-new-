@@ -22,7 +22,12 @@ import {
 } from './src/types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://zfifmfzrzxmbwilcsnhx.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseKey = 
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 
+  process.env.SUPABASE_SECRET_KEY || 
+  process.env.SUPABASE_ANON_KEY || 
+  process.env.VITE_SUPABASE_ANON_KEY || 
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmaWZtZnpyenhtYndpbGNzbmh4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTk0OTU0MSwiZXhwIjoyMTA3NTI1NTQxfQ.XLkbcZpIOtmbvvBjq3X6SRoN4r-TVGYfZwkOTBOK1Pg';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // In-memory persistent state (seeded with comprehensive initial data)
