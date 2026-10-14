@@ -117,10 +117,14 @@ export function App() {
     loadData();
   }, []);
 
+  // Error state for failed submissions
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+
   // Handle Search Submission
   const handleSearchSubmit = async (criteria: SearchCriteria) => {
     setCurrentCriteria(criteria);
     setIsSearching(true);
+    setSubmissionError(null);
 
     try {
       // 1. Fetch matching hospitals from backend database
@@ -129,15 +133,21 @@ export function App() {
       setHasSearched(true);
 
       // 2. Submit lead to database
-      await api.createLead({
-        name: criteria.name,
-        mobile: criteria.mobile,
-        treatment: criteria.treatment,
-        budget: criteria.budget,
-        city: criteria.city,
-        source: 'Acquire Surgery Search Engine',
-        matchedHospitalIds: matches.map(m => m.id),
-      });
+      try {
+        await api.createLead({
+          name: criteria.name,
+          mobile: criteria.mobile,
+          treatment: criteria.treatment,
+          budget: criteria.budget,
+          city: criteria.city,
+          source: 'Acquire Surgery Search Engine',
+          matchedHospitalIds: matches.map(m => m.id),
+        });
+      } catch (dbErr: any) {
+        const errorMsg = dbErr?.message || 'Unknown database error';
+        console.error('Database lead insert failed:', errorMsg);
+        setSubmissionError(`Database Error: ${errorMsg}`);
+      }
 
       // 3. Show Confirmation Modal / Popup with 24-hour representative contact confirmation message
       setResultsModalState({
@@ -147,8 +157,9 @@ export function App() {
         mobile: criteria.mobile,
         matchingHospitals: matches,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Search error:', err);
+      setSubmissionError(`Submission error: ${err?.message || 'Please check your connection'}`);
     } finally {
       setIsSearching(false);
     }
@@ -330,6 +341,7 @@ export function App() {
         }}
         isSubmitting={isSearching}
         initialCriteria={currentCriteria}
+        submissionError={submissionError}
       />
 
       {/* Hospital Detail Modal */}

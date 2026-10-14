@@ -1,0 +1,5 @@
+user=postgres
+password=jn7Kt52EEYOLLayd
+host=db.zfifmfzrzxmbwilcsnhx.supabase.co
+port=5432
+dbname=postgres

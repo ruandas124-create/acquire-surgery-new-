@@ -13,7 +13,6 @@ const supabaseAnonKey =
   import.meta.env.SUPABASE_ANON_KEY || 
   DEFAULT_SUPABASE_ANON_KEY;
 
-// Validates whether Supabase credentials were provided in the build/deployment environment
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
   supabaseAnonKey &&
@@ -21,56 +20,23 @@ export const isSupabaseConfigured = Boolean(
   typeof supabaseAnonKey === 'string' &&
   supabaseUrl.trim() !== '' &&
   supabaseAnonKey.trim() !== '' &&
-  supabaseUrl.startsWith('http') &&
-  !supabaseUrl.includes('placeholder')
+  supabaseUrl.startsWith('http')
 );
 
-// Safe fallback client builder to prevent top-level runtime crashes
-function createSafeFallbackClient(): any {
-  const chainable = () => {
-    const obj: any = {
-      select: () => obj,
-      insert: () => obj,
-      update: () => obj,
-      delete: () => obj,
-      eq: () => obj,
-      neq: () => obj,
-      ilike: () => obj,
-      like: () => obj,
-      order: () => obj,
-      limit: () => obj,
-      single: async () => ({ data: null, error: null }),
-      then: (resolve: any) => Promise.resolve({ data: [], error: null }).then(resolve),
-    };
-    return obj;
-  };
-
-  return {
-    from: () => chainable(),
-    auth: {
-      getUser: async () => ({ data: { user: null }, error: null }),
-      getSession: async () => ({ data: { session: null }, error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    },
-  };
-}
-
+// Always create the real Supabase client using the provided project URL and Anon key
 let clientInstance: SupabaseClient;
 
 try {
-  if (isSupabaseConfigured) {
-    clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    });
-  } else {
-    clientInstance = createSafeFallbackClient();
-  }
+  clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  });
 } catch (err) {
-  console.warn('Acquire Surgery: Failed to initialize live Supabase client, using safe offline fallback.', err);
-  clientInstance = createSafeFallbackClient();
+  console.warn('Failed to initialize Supabase client:', err);
+  // Fallback stub if needed
+  clientInstance = createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY);
 }
 
 export const supabase = clientInstance;

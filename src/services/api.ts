@@ -210,6 +210,78 @@ export const api = {
     return localTreatments;
   },
 
+  async addTreatment(name: string, category: string = 'General Surgery'): Promise<TreatmentInfo> {
+    try {
+      const res = await fetch('/api/treatments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          localTreatments.push(json.data);
+          return json.data;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    const newT: TreatmentInfo = {
+      id: `treat-${Date.now()}`,
+      name,
+      category,
+      averageBangaloreMinCost: 50000,
+      averageBangaloreMaxCost: 120000,
+      recoveryDays: '1–2 weeks',
+      typicalStay: '1–2 days',
+      description: '',
+      commonProcedures: [name],
+    };
+    localTreatments.push(newT);
+    return newT;
+  },
+
+  async updateTreatment(id: string, name: string): Promise<TreatmentInfo> {
+    try {
+      const res = await fetch(`/api/treatments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          const idx = localTreatments.findIndex(t => t.id === id);
+          if (idx !== -1) localTreatments[idx] = json.data;
+          return json.data;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    const idx = localTreatments.findIndex(t => t.id === id);
+    if (idx !== -1) {
+      localTreatments[idx].name = name;
+      return localTreatments[idx];
+    }
+    throw new Error('Treatment not found');
+  },
+
+  async deleteTreatment(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`/api/treatments/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        localTreatments = localTreatments.filter(t => t.id !== id);
+        return true;
+      }
+    } catch {
+      // fallback
+    }
+    localTreatments = localTreatments.filter(t => t.id !== id);
+    return true;
+  },
+
   async getLeads(): Promise<Lead[]> {
     if (isSupabaseConfigured) {
       try {
@@ -238,6 +310,17 @@ export const api = {
   },
 
   async createLead(criteria: SearchCriteria & { preferredHospitalId?: string; source?: string; matchedHospitalIds?: string[] }): Promise<{ lead: Lead; matchingCount: number }> {
+    // Supabase table columns: id, name, phone, email, treatment, budget, city, status, source, notes, created_at
+    const dbPayload = {
+      name: criteria.name,
+      phone: criteria.mobile,
+      email: `${criteria.name.toLowerCase().replace(/[^a-z0-9]/g, '')}@acquirepatient.com`,
+      treatment: criteria.treatment,
+      city: criteria.city || 'Bangalore',
+      status: 'New Leads',
+      notes: [`Inquiry submitted for ${criteria.treatment} (Budget: ${criteria.budget || 'Standard'}, Source: ${criteria.source || 'Search Tool'})`]
+    };
+
     const newLeadData: Partial<Lead> = {
       name: criteria.name,
       mobile: criteria.mobile,
@@ -250,18 +333,29 @@ export const api = {
     };
     
     if (isSupabaseConfigured) {
-      try {
-        const { data, error } = await supabase.from('leads').insert([newLeadData]).select().single();
-        if (!error && data) {
-          localLeads.unshift(data);
-          saveLocalLeads(localLeads);
-          return { lead: data, matchingCount: 0 };
-        }
-        if (error) {
-          console.warn('Supabase createLead failed, falling back to local memory:', error.message || error);
-        }
-      } catch (err) {
-        console.warn('Supabase createLead error, using local state:', err);
+      const { data, error } = await supabase.from('leads').insert([dbPayload]).select().single();
+      if (error) {
+        console.error('Supabase createLead insertion error:', error.message, error.details, error.hint);
+        throw new Error(`Database error: ${error.message} (${error.details || error.hint || 'Check RLS policies or table columns'})`);
+      }
+      if (data) {
+        const insertedLead: Lead = {
+          id: data.id || `lead-${Date.now()}`,
+          name: data.name || newLeadData.name || '',
+          mobile: data.phone || data.mobile || newLeadData.mobile || '',
+          treatment: data.treatment || newLeadData.treatment || '',
+          budget: data.budget || newLeadData.budget || '',
+          city: data.city || newLeadData.city || 'Bangalore',
+          status: (data.status as LeadStatus) || 'New Leads',
+          source: data.source || 'Website',
+          notes: data.notes || newLeadData.notes || [],
+          matchedHospitalIds: criteria.matchedHospitalIds || [],
+          matchedHospitalCount: criteria.matchedHospitalIds?.length || 0,
+          createdAt: data.created_at || new Date().toISOString(),
+        };
+        localLeads.unshift(insertedLead);
+        saveLocalLeads(localLeads);
+        return { lead: insertedLead, matchingCount: insertedLead.matchedHospitalCount };
       }
     }
 

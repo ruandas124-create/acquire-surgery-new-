@@ -275,16 +275,25 @@ async function startServer() {
   });
 
   // Treatments: GET
-  app.get('/api/treatments', (req, res) => {
-    res.json({ success: true, data: treatments });
+  app.get('/api/treatments', async (req, res) => {
+    try {
+      const { data, error } = await supabase.from('treatments').select('name');
+      if (error) throw error;
+      res.json({ success: true, data: data || [] });
+    } catch (err) {
+      console.error('Error fetching treatments from Supabase:', err);
+      // Fallback to in-memory if Supabase fails
+      res.json({ success: true, data: treatments });
+    }
   });
 
   // Treatments: POST (Admin add treatment)
-  app.post('/api/treatments', (req, res) => {
+  app.post('/api/treatments', async (req, res) => {
     const body = req.body;
     if (!body.name) {
       return res.status(400).json({ success: false, error: 'Treatment name required' });
     }
+    
     const newTreatment: TreatmentInfo = {
       id: `treat-${Date.now()}`,
       name: body.name,
@@ -296,8 +305,53 @@ async function startServer() {
       description: body.description || '',
       commonProcedures: body.commonProcedures || [body.name],
     };
-    treatments.push(newTreatment);
-    res.status(201).json({ success: true, data: newTreatment });
+
+    try {
+      const { data, error } = await supabase.from('treatments').insert([newTreatment]).select().single();
+      if (error) throw error;
+      treatments.push(data); // update local state
+      res.status(201).json({ success: true, data: data });
+    } catch (err) {
+      console.error('Error inserting treatment to Supabase:', err);
+      // Fallback
+      treatments.push(newTreatment);
+      res.status(201).json({ success: true, data: newTreatment });
+    }
+  });
+
+  // Treatments: PUT (Admin update treatment)
+  app.put('/api/treatments/:id', async (req, res) => {
+    try {
+      const { data, error } = await supabase.from('treatments').update(req.body).eq('id', req.params.id).select().single();
+      if (error) throw error;
+      const index = treatments.findIndex(t => t.id === req.params.id);
+      if (index !== -1) treatments[index] = data;
+      res.json({ success: true, data: data });
+    } catch (err) {
+      console.error('Error updating treatment in Supabase:', err);
+      // Fallback
+      const index = treatments.findIndex(t => t.id === req.params.id);
+      if (index === -1) return res.status(404).json({ success: false, error: 'Treatment not found' });
+      treatments[index] = { ...treatments[index], ...req.body, id: req.params.id };
+      res.json({ success: true, data: treatments[index] });
+    }
+  });
+
+  // Treatments: DELETE (Admin delete treatment)
+  app.delete('/api/treatments/:id', async (req, res) => {
+    try {
+      const { error } = await supabase.from('treatments').delete().eq('id', req.params.id);
+      if (error) throw error;
+      treatments = treatments.filter(t => t.id !== req.params.id);
+      res.json({ success: true, data: { id: req.params.id } });
+    } catch (err) {
+      console.error('Error deleting treatment in Supabase:', err);
+      // Fallback
+      const index = treatments.findIndex(t => t.id === req.params.id);
+      if (index === -1) return res.status(404).json({ success: false, error: 'Treatment not found' });
+      const deleted = treatments.splice(index, 1);
+      res.json({ success: true, data: deleted[0] });
+    }
   });
 
   // Leads: GET (Admin view leads)

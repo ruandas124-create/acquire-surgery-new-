@@ -73,18 +73,16 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          {/* Exact Required Button */}
           <button
-            id="modal-view-hospital-options-btn"
-            onClick={onBackToOptions}
+            id="modal-call-direct-btn"
+            onClick={onClose}
             className="w-full bg-[#0A3B75] hover:bg-[#08305f] text-white font-bold text-base py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>View Hospital Options</span>
-            <ArrowRight className="w-4 h-4 text-blue-200" />
+            <span>Close Window</span>
           </button>
 
           <a
-            id="modal-call-direct-btn"
+            id="modal-call-direct-btn-tel"
             href="tel:+919429693887"
             className="w-full inline-flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-sm py-3 px-6 rounded-xl border border-emerald-200 transition-colors"
           >

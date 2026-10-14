@@ -185,73 +185,7 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
               </button>
             </form>
 
-            {/* Quick Fill Credentials */}
-            <div className="pt-4 border-t border-slate-100">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                  <KeyRound className="w-3 h-3 text-slate-400" />
-                  Database Credentials (Click to Fill)
-                </span>
-              </div>
 
-              <div className="space-y-2 text-xs">
-                {/* Admin Account */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickSelectEmail('Admin@acquire.com', 'Acquire@8131')}
-                  className="w-full text-left p-2.5 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-100/60 transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <span className="font-bold text-blue-900 block text-xs">
-                      Admin@acquire.com
-                    </span>
-                    <span className="text-[10px] text-blue-700">
-                      Master Administrator Dashboard (Supabase user_roles)
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200 group-hover:border-blue-400">
-                    Admin
-                  </span>
-                </button>
-
-                {/* Hospital Accounts */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickSelectEmail('manipal@acquiresurgery.com')}
-                  className="w-full text-left p-2.5 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-100/60 transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <span className="font-bold text-emerald-900 block text-xs">
-                      manipal@acquiresurgery.com
-                    </span>
-                    <span className="text-[10px] text-emerald-700">
-                      Manipal Hospital Partner Dashboard
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200 group-hover:border-emerald-400">
-                    Hospital
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickSelectEmail('aster@acquiresurgery.com')}
-                  className="w-full text-left p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <span className="font-bold text-slate-800 block text-xs">
-                      aster@acquiresurgery.com
-                    </span>
-                    <span className="text-[10px] text-slate-500">
-                      Aster CMI Hospital Partner Dashboard
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200 group-hover:border-slate-300">
-                    Hospital
-                  </span>
-                </button>
-              </div>
-            </div>
 
             {/* Cancel / Return */}
             <div className="text-center pt-2">

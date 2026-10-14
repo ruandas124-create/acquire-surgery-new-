@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SearchCriteria } from '../types';
+import { api } from '../services/api';
 import { 
   Search, 
   MapPin, 
@@ -23,6 +24,7 @@ interface HospitalMatchingModalProps {
   onSearchSubmit: (criteria: SearchCriteria) => void;
   isSubmitting?: boolean;
   initialCriteria?: Partial<SearchCriteria>;
+  submissionError?: string | null;
 }
 
 const COMMON_TREATMENTS = [
@@ -68,6 +70,7 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
   onSearchSubmit,
   isSubmitting = false,
   initialCriteria,
+  submissionError,
 }) => {
   const [name, setName] = useState(initialCriteria?.name || '');
   const [mobile, setMobile] = useState(initialCriteria?.mobile || '');
@@ -85,6 +88,34 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const [treatmentsList, setTreatmentsList] = useState<string[]>([]);
+  const [isTreatmentsLoading, setIsTreatmentsLoading] = useState(false);
+  const [treatmentsError, setTreatmentsError] = useState<string | null>(null);
+
+  // Load dynamic treatments from API / Database
+  useEffect(() => {
+    async function fetchTreatments() {
+      setIsTreatmentsLoading(true);
+      setTreatmentsError(null);
+      try {
+        const list = await api.getTreatments();
+        if (Array.isArray(list)) {
+          // Extract names, ensure unique, filter out empty strings
+          const uniqueNames = Array.from(new Set(list.map(t => t.name).filter(n => n && n.trim() !== '')));
+          setTreatmentsList(uniqueNames);
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic treatments list', err);
+        setTreatmentsError('Could not load treatment options.');
+      } finally {
+        setIsTreatmentsLoading(false);
+      }
+    }
+    if (isOpen) {
+        fetchTreatments();
+    }
+  }, [isOpen]);
 
   // Sync initial criteria when opened
   useEffect(() => {
@@ -192,7 +223,7 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
     });
   };
 
-  const filteredTreatments = COMMON_TREATMENTS.filter(t =>
+  const filteredTreatments = treatmentsList.filter(t =>
     t.toLowerCase().includes(treatmentQuery.toLowerCase())
   );
 
@@ -251,8 +282,31 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
 
             {/* Scrollable Form Body */}
             <div className="p-5 sm:p-7 overflow-y-auto grow space-y-5 sm:space-y-6">
+              {/* Submission Error Banner */}
+              {submissionError && (
+                <div 
+                  id="modal-error-banner"
+                  className="p-4 sm:p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start gap-3.5 shadow-xs"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertCircle className="w-6 h-6 text-rose-600" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-rose-950">
+                      Failed to store data in Supabase Database:
+                    </p>
+                    <p className="text-xs font-mono bg-rose-100/80 p-2 rounded-lg text-rose-900 overflow-x-auto">
+                      {submissionError}
+                    </p>
+                    <p className="text-[11px] text-rose-700 pt-1">
+                      Please verify your Supabase table columns (`name`, `phone`, `email`, `treatment`, `city`, `status`, `source`, `notes`) and Row Level Security (RLS) policies.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Confirmation message displayed after successful submission */}
-              {isSubmitted && (
+              {isSubmitted && !submissionError && (
                 <div 
                   id="modal-confirmation-banner"
                   className="p-4 sm:p-5 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-slate-800 flex items-start gap-3.5 shadow-xs"
@@ -265,7 +319,7 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
                       Thank you for your submission! Our representative will contact you within 24 hours.
                     </p>
                     <p className="text-xs text-emerald-800">
-                      Your request has been safely received by Acquire Surgery.
+                      Your request has been safely stored in the Supabase database.
                     </p>
                   </div>
                 </div>
@@ -318,7 +372,13 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
                   {/* Dropdown Menu */}
                   {isTreatmentOpen && (
                     <div className="absolute z-40 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-56 overflow-y-auto py-1.5">
-                      {filteredTreatments.length > 0 ? (
+                      {isTreatmentsLoading ? (
+                        <div className="p-3 text-xs text-slate-500">Loading options...</div>
+                      ) : treatmentsError ? (
+                        <div className="p-3 text-xs text-rose-600 flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5" /> {treatmentsError}
+                        </div>
+                      ) : filteredTreatments.length > 0 ? (
                         filteredTreatments.map((t) => (
                           <button
                             key={t}

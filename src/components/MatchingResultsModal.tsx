@@ -153,25 +153,15 @@ export const MatchingResultsModal: React.FC<MatchingResultsModalProps> = ({
           </div>
         </div>
 
-        {/* Modal Footer CTAs: 1. Close, 2. View Hospitals */}
+        {/* Modal Footer CTAs: Close */}
         <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
           {/* Button 1: Close */}
           <button
             id="modal-close-results-btn"
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-sm rounded-xl border border-slate-300 transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-7 py-3 bg-[#0A3B75] hover:bg-[#08305f] text-white font-bold text-sm sm:text-base rounded-xl shadow-md transition-colors cursor-pointer"
           >
-            Close
-          </button>
-
-          {/* Button 2: View Hospitals */}
-          <button
-            id="modal-view-hospitals-btn"
-            onClick={onViewHospitalOptions}
-            className="w-full sm:w-auto bg-[#0A3B75] hover:bg-[#08305f] text-white font-bold text-sm sm:text-base py-3 px-7 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>View Hospital Options</span>
-            <ArrowRight className="w-4 h-4 text-blue-200" />
+            Close Window
           </button>
         </div>
       </motion.div>
