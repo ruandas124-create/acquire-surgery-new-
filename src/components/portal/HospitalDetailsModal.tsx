@@ -111,7 +111,7 @@ export const HospitalDetailsModal: React.FC<HospitalDetailsModalProps> = ({
               </div>
               <div>
                 <span className="text-slate-500 block">Official Contact</span>
-                <span className="font-semibold text-slate-900">{hospital.mobile || hospital.phone || '+91 94296 93887'}</span>
+                <span className="font-semibold text-slate-900">{hospital.mobile || hospital.phone || '+91 98449 55100'}</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Official Email</span>

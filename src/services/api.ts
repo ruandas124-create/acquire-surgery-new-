@@ -211,75 +211,38 @@ export const api = {
   },
 
   async addTreatment(name: string, category: string = 'General Surgery'): Promise<TreatmentInfo> {
-    try {
-      const res = await fetch('/api/treatments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, category }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) {
-          localTreatments.push(json.data);
-          return json.data;
-        }
-      }
-    } catch {
-      // fallback
+    const res = await fetch('/api/treatments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, category }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (res.ok && json.success) {
+      return json.data;
     }
-    const newT: TreatmentInfo = {
-      id: `treat-${Date.now()}`,
-      name,
-      category,
-      averageBangaloreMinCost: 50000,
-      averageBangaloreMaxCost: 120000,
-      recoveryDays: '1–2 weeks',
-      typicalStay: '1–2 days',
-      description: '',
-      commonProcedures: [name],
-    };
-    localTreatments.push(newT);
-    return newT;
+    throw new Error(json.error || 'Failed to save treatment to Supabase');
   },
 
   async updateTreatment(id: string, name: string): Promise<TreatmentInfo> {
-    try {
-      const res = await fetch(`/api/treatments/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) {
-          const idx = localTreatments.findIndex(t => t.id === id);
-          if (idx !== -1) localTreatments[idx] = json.data;
-          return json.data;
-        }
-      }
-    } catch {
-      // fallback
+    const res = await fetch(`/api/treatments/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (res.ok && json.success) {
+      return json.data;
     }
-    const idx = localTreatments.findIndex(t => t.id === id);
-    if (idx !== -1) {
-      localTreatments[idx].name = name;
-      return localTreatments[idx];
-    }
-    throw new Error('Treatment not found');
+    throw new Error(json.error || 'Failed to update treatment in Supabase');
   },
 
   async deleteTreatment(id: string): Promise<boolean> {
-    try {
-      const res = await fetch(`/api/treatments/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        localTreatments = localTreatments.filter(t => t.id !== id);
-        return true;
-      }
-    } catch {
-      // fallback
+    const res = await fetch(`/api/treatments/${id}`, { method: 'DELETE' });
+    const json = await res.json().catch(() => ({}));
+    if (res.ok && json.success) {
+      return true;
     }
-    localTreatments = localTreatments.filter(t => t.id !== id);
-    return true;
+    throw new Error(json.error || 'Failed to delete treatment from Supabase');
   },
 
   async getLeads(): Promise<Lead[]> {
@@ -464,7 +427,7 @@ export const api = {
     const newSched: PatientSchedule = {
       id: `sched-${Date.now()}`,
       patientName: data.patientName || 'Patient',
-      mobile: data.mobile || '+91 94296 93887',
+      mobile: data.mobile || '+91 98449 55100',
       hospitalId: data.hospitalId || 'hosp-manipal-oar',
       hospitalName: data.hospitalName || 'Manipal Hospital',
       surgeryName: data.surgeryName || 'General Surgery',

@@ -78,12 +78,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-blue-200/60 hidden sm:inline">|</span>
             <a
-              href="tel:+919429693887"
+              href="tel:+919844955100"
               className="flex items-center gap-1.5 font-medium hover:text-emerald-200 transition-colors whitespace-nowrap shrink-0"
               title="Call Acquire Surgery Patient Desk"
             >
               <Phone className="w-3 h-3 text-emerald-300 shrink-0" />
-              <span className="whitespace-nowrap tabular-nums">+91&nbsp;94296&nbsp;93887</span>
+              <span className="whitespace-nowrap tabular-nums">+91&nbsp;98449&nbsp;55100</span>
             </a>
           </div>
         </div>
@@ -179,11 +179,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
 
             <a
-              href="tel:+919429693887"
+              href="tel:+919844955100"
               className="flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-100 text-center"
             >
               <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Speak to Hospital Coordinator <span className="whitespace-nowrap font-bold">(+91&nbsp;94296&nbsp;93887)</span></span>
+              <span>Speak to Hospital Coordinator <span className="whitespace-nowrap font-bold">(+91&nbsp;98449&nbsp;55100)</span></span>
             </a>
           </div>
         </div>

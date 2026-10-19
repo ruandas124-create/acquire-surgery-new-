@@ -8,8 +8,8 @@ interface TreatmentFloatingContactBarProps {
 }
 
 export const TreatmentFloatingContactBar: React.FC<TreatmentFloatingContactBarProps> = ({
-  phoneNumber = '+919429693887',
-  whatsAppNumber = '919429693887',
+  phoneNumber = '+919844955100',
+  whatsAppNumber = '919844955100',
   defaultWhatsAppMessage = 'Hi Acquire Surgery, I would like guidance regarding surgical treatments and hospital options in Bangalore.',
 }) => {
   const cleanPhone = phoneNumber.replace(/\s+/g, '');

@@ -129,9 +129,6 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
                   <label className="text-xs font-bold text-slate-700 block">
                     Password
                   </label>
-                  <span className="text-[11px] text-slate-400 font-medium">
-                    (Master Admin: Acquire@8131)
-                  </span>
                 </div>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -177,33 +174,6 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Access Pills */}
-            <div className="pt-3 border-t border-slate-100 text-center">
-              <span className="text-[11px] text-slate-400 block mb-2 font-medium">Quick Credentials for Testing:</span>
-              <div className="flex flex-wrap justify-center gap-1.5 text-[11px]">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('Admin@acquire.com');
-                    setPassword('Acquire@8131');
-                  }}
-                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold cursor-pointer transition-colors"
-                >
-                  Admin (Acquire@8131)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('manipal@acquiresurgery.com');
-                    setPassword('surgery123');
-                  }}
-                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold cursor-pointer transition-colors"
-                >
-                  Hospital Partner
-                </button>
-              </div>
-            </div>
 
             {/* Return Link */}
             <div className="text-center pt-1">

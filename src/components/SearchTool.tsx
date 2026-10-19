@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { SearchCriteria } from '../types';
+import { api } from '../services/api';
+import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 import { 
   Search, 
   MapPin, 
@@ -22,20 +24,6 @@ interface SearchToolProps {
   compactMode?: boolean;
 }
 
-const COMMON_TREATMENTS = [
-  'Piles',
-  'Knee Replacement',
-  'Cataract Surgery',
-  'Gallbladder Surgery',
-  'Hernia Surgery',
-  'Kidney Stone Surgery',
-  'Heart Surgery',
-  'Appendectomy',
-  'Hip Replacement',
-  'Hysterectomy (Gynae Surgery)',
-  'Other'
-];
-
 const BUDGET_TIERS = [
   'Below ₹50,000',
   '₹50,000 – ₹1 Lakh',
@@ -55,7 +43,7 @@ export const SearchTool: React.FC<SearchToolProps> = ({
 }) => {
   const [name, setName] = useState(initialCriteria?.name || '');
   const [mobile, setMobile] = useState(initialCriteria?.mobile || '');
-  const [treatment, setTreatment] = useState(initialCriteria?.treatment || 'Knee Replacement');
+  const [treatment, setTreatment] = useState(initialCriteria?.treatment || '');
   const [treatmentQuery, setTreatmentQuery] = useState(initialCriteria?.treatment || '');
   const [isTreatmentOpen, setIsTreatmentOpen] = useState(false);
   const [budget, setBudget] = useState(initialCriteria?.budget || '₹1 – ₹2 Lakh');
@@ -68,6 +56,68 @@ export const SearchTool: React.FC<SearchToolProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [treatmentsList, setTreatmentsList] = useState<string[]>([]);
+  const [isTreatmentsLoading, setIsTreatmentsLoading] = useState(false);
+  const [treatmentsError, setTreatmentsError] = useState<string | null>(null);
+
+  const fetchTreatments = useCallback(async () => {
+    setIsTreatmentsLoading(true);
+    setTreatmentsError(null);
+    try {
+      let treatmentNames: string[] = [];
+
+      if (isSupabaseConfigured && supabase) {
+        const { data, error } = await supabase
+          .from('treatments')
+          .select('name')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        if (data && Array.isArray(data)) {
+          treatmentNames = data
+            .map((item: any) => (typeof item?.name === 'string' ? item.name.trim() : ''))
+            .filter((n: string) => n.length > 0);
+        }
+      } else {
+        const list = await api.getTreatments();
+        if (Array.isArray(list)) {
+          treatmentNames = list
+            .map((t: any) => (typeof t?.name === 'string' ? t.name.trim() : ''))
+            .filter((n: string) => n.length > 0);
+        }
+      }
+
+      const uniqueNames = Array.from(new Set(treatmentNames));
+      setTreatmentsList(uniqueNames);
+    } catch (err: any) {
+      console.error('Failed to load treatments in SearchTool from Supabase:', err);
+      try {
+        const list = await api.getTreatments();
+        if (Array.isArray(list) && list.length > 0) {
+          const uniqueNames = Array.from(
+            new Set(
+              list
+                .map((t: any) => (typeof t?.name === 'string' ? t.name.trim() : ''))
+                .filter((n: string) => n.length > 0)
+            )
+          );
+          setTreatmentsList(uniqueNames);
+          return;
+        }
+      } catch {
+        // fallback failed
+      }
+      setTreatmentsError(err?.message || 'Could not load treatment options.');
+    } finally {
+      setIsTreatmentsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTreatments();
+  }, [fetchTreatments]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -132,9 +182,12 @@ export const SearchTool: React.FC<SearchToolProps> = ({
     });
   };
 
-  const filteredTreatments = COMMON_TREATMENTS.filter(t =>
-    t.toLowerCase().includes(treatmentQuery.toLowerCase())
-  );
+  const filteredTreatments =
+    !treatmentQuery.trim() || treatmentQuery.trim().toLowerCase() === treatment.trim().toLowerCase()
+      ? treatmentsList
+      : treatmentsList.filter(t =>
+          t.toLowerCase().includes(treatmentQuery.trim().toLowerCase())
+        );
 
   return (
     <div
@@ -288,8 +341,34 @@ export const SearchTool: React.FC<SearchToolProps> = ({
 
             {/* Dropdown Menu */}
             {isTreatmentOpen && (
-              <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto py-1">
-                {filteredTreatments.length > 0 ? (
+              <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto py-1 divide-y divide-slate-100/60">
+                {isTreatmentsLoading ? (
+                  <div className="p-3 text-xs text-slate-500 flex items-center justify-center gap-2">
+                    <div className="w-3.5 h-3.5 border-2 border-[#0A3B75] border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>Loading treatments...</span>
+                  </div>
+                ) : treatmentsError ? (
+                  <div className="p-3 text-xs text-rose-600 flex items-center justify-between gap-2 bg-rose-50/70 m-1 rounded-lg border border-rose-200">
+                    <div className="flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{treatmentsError}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchTreatments();
+                      }}
+                      className="text-xs font-bold underline text-[#0A3B75] hover:text-blue-800"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : treatmentsList.length === 0 ? (
+                  <div className="p-3 text-xs text-slate-500 text-center">
+                    No treatments found in database.
+                  </div>
+                ) : filteredTreatments.length > 0 ? (
                   filteredTreatments.map(t => (
                     <button
                       key={t}
@@ -299,12 +378,12 @@ export const SearchTool: React.FC<SearchToolProps> = ({
                         setTreatmentQuery(t);
                         setIsTreatmentOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-blue-50 transition-colors ${
+                      className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-blue-50 transition-colors cursor-pointer ${
                         treatment === t ? 'bg-blue-50/70 font-bold text-[#0A3B75]' : 'text-slate-700'
                       }`}
                     >
                       <span>{t}</span>
-                      {treatment === t && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                      {treatment === t && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                     </button>
                   ))
                 ) : (

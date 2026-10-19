@@ -134,7 +134,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
             </p>
             <p className="text-xs sm:text-sm text-slate-600 flex items-center justify-center md:justify-start gap-1.5">
               <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Patient Helpline: <span className="whitespace-nowrap font-semibold">+91&nbsp;94296&nbsp;93887</span></span>
+              <span>Patient Helpline: <span className="whitespace-nowrap font-semibold">+91&nbsp;98449&nbsp;55100</span></span>
             </p>
           </div>
 

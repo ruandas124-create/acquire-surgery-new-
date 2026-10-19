@@ -105,8 +105,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
                 </div>
                 <div>
                   <span className="block text-[11px] text-slate-400">24x7 Surgical Coordination</span>
-                  <a href="tel:+919429693887" className="text-white hover:text-teal-300 font-bold tabular-nums whitespace-nowrap">
-                    +91&nbsp;94296&nbsp;93887
+                  <a href="tel:+919844955100" className="text-white hover:text-teal-300 font-bold tabular-nums whitespace-nowrap">
+                    +91&nbsp;98449&nbsp;55100
                   </a>
                 </div>
               </div>

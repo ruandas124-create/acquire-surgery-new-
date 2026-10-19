@@ -274,83 +274,130 @@ async function startServer() {
     res.json({ success: true, data: categories[index] });
   });
 
-  // Treatments: GET
+  // Treatments: GET (Fetch all treatments from Supabase table treatments)
   app.get('/api/treatments', async (req, res) => {
     try {
-      const { data, error } = await supabase.from('treatments').select('name');
+      const { data, error } = await supabase
+        .from('treatments')
+        .select('*')
+        .order('name', { ascending: true });
+
       if (error) throw error;
-      res.json({ success: true, data: data || [] });
-    } catch (err) {
+
+      const formatted = (data || []).map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        category: row.category || 'General Surgery',
+        averageBangaloreMinCost: row.average_bangalore_min_cost || 50000,
+        averageBangaloreMaxCost: row.average_bangalore_max_cost || 120000,
+        recoveryDays: row.recovery_days || '1–2 weeks',
+        typicalStay: row.typical_stay || '1–2 days',
+        description: row.description || '',
+        commonProcedures: row.common_procedures || [row.name],
+      }));
+      res.json({ success: true, data: formatted });
+    } catch (err: any) {
       console.error('Error fetching treatments from Supabase:', err);
-      // Fallback to in-memory if Supabase fails
-      res.json({ success: true, data: treatments });
+      res.status(500).json({ success: false, error: err?.message || 'Database error' });
     }
   });
 
-  // Treatments: POST (Admin add treatment)
+  // Treatments: POST (Admin add treatment - saves to Supabase table treatments, column name)
   app.post('/api/treatments', async (req, res) => {
     const body = req.body;
-    if (!body.name) {
-      return res.status(400).json({ success: false, error: 'Treatment name required' });
+    if (!body.name || !body.name.trim()) {
+      return res.status(400).json({ success: false, error: 'Treatment name is required' });
     }
     
-    const newTreatment: TreatmentInfo = {
-      id: `treat-${Date.now()}`,
-      name: body.name,
-      category: body.category || 'General Surgery',
-      averageBangaloreMinCost: body.averageBangaloreMinCost || 50000,
-      averageBangaloreMaxCost: body.averageBangaloreMaxCost || 120000,
-      recoveryDays: body.recoveryDays || '1–2 weeks',
-      typicalStay: body.typicalStay || '1–2 days',
-      description: body.description || '',
-      commonProcedures: body.commonProcedures || [body.name],
+    const id = body.id || `treat-${Date.now()}`;
+    const name = body.name.trim();
+    const category = body.category || 'General Surgery';
+
+    const dbPayload: any = {
+      id,
+      name,
+      category,
+      average_bangalore_min_cost: body.averageBangaloreMinCost || 50000,
+      average_bangalore_max_cost: body.averageBangaloreMaxCost || 120000,
+      recovery_days: body.recoveryDays || '1–2 weeks',
+      typical_stay: body.typicalStay || '1–2 days',
+      description: body.description || null,
+      common_procedures: body.commonProcedures || [name],
     };
 
     try {
-      const { data, error } = await supabase.from('treatments').insert([newTreatment]).select().single();
+      const { data, error } = await supabase.from('treatments').insert([dbPayload]).select().single();
       if (error) throw error;
-      treatments.push(data); // update local state
-      res.status(201).json({ success: true, data: data });
-    } catch (err) {
-      console.error('Error inserting treatment to Supabase:', err);
-      // Fallback
-      treatments.push(newTreatment);
-      res.status(201).json({ success: true, data: newTreatment });
+      const responseData: TreatmentInfo = {
+        id: data.id,
+        name: data.name,
+        category: data.category || 'General Surgery',
+        averageBangaloreMinCost: data.average_bangalore_min_cost || 50000,
+        averageBangaloreMaxCost: data.average_bangalore_max_cost || 120000,
+        recoveryDays: data.recovery_days || '1–2 weeks',
+        typicalStay: data.typical_stay || '1–2 days',
+        description: data.description || '',
+        commonProcedures: data.common_procedures || [data.name],
+      };
+      res.status(201).json({ success: true, data: responseData });
+    } catch (err: any) {
+      console.error('Error inserting treatment to Supabase treatments table:', err);
+      res.status(500).json({ success: false, error: err?.message || 'Failed to save treatment to Supabase' });
     }
   });
 
-  // Treatments: PUT (Admin update treatment)
+  // Treatments: PUT (Admin update treatment - updates Supabase table treatments, column name)
   app.put('/api/treatments/:id', async (req, res) => {
     try {
-      const { data, error } = await supabase.from('treatments').update(req.body).eq('id', req.params.id).select().single();
+      const { name, category, averageBangaloreMinCost, averageBangaloreMaxCost } = req.body;
+      const updateData: any = {};
+      if (name !== undefined) {
+        if (!name.trim()) {
+          return res.status(400).json({ success: false, error: 'Treatment name cannot be empty' });
+        }
+        updateData.name = name.trim();
+        updateData.common_procedures = [name.trim()];
+      }
+      if (category !== undefined) updateData.category = category.trim();
+      if (averageBangaloreMinCost !== undefined) updateData.average_bangalore_min_cost = Number(averageBangaloreMinCost);
+      if (averageBangaloreMaxCost !== undefined) updateData.average_bangalore_max_cost = Number(averageBangaloreMaxCost);
+
+      const { data, error } = await supabase
+        .from('treatments')
+        .update(updateData)
+        .eq('id', req.params.id)
+        .select()
+        .single();
+
       if (error) throw error;
-      const index = treatments.findIndex(t => t.id === req.params.id);
-      if (index !== -1) treatments[index] = data;
-      res.json({ success: true, data: data });
-    } catch (err) {
-      console.error('Error updating treatment in Supabase:', err);
-      // Fallback
-      const index = treatments.findIndex(t => t.id === req.params.id);
-      if (index === -1) return res.status(404).json({ success: false, error: 'Treatment not found' });
-      treatments[index] = { ...treatments[index], ...req.body, id: req.params.id };
-      res.json({ success: true, data: treatments[index] });
+      
+      const responseData: TreatmentInfo = {
+        id: data.id,
+        name: data.name,
+        category: data.category || 'General Surgery',
+        averageBangaloreMinCost: data.average_bangalore_min_cost || 50000,
+        averageBangaloreMaxCost: data.average_bangalore_max_cost || 120000,
+        recoveryDays: data.recovery_days || '1–2 weeks',
+        typicalStay: data.typical_stay || '1–2 days',
+        description: data.description || '',
+        commonProcedures: data.common_procedures || [data.name],
+      };
+      res.json({ success: true, data: responseData });
+    } catch (err: any) {
+      console.error('Error updating treatment in Supabase treatments table:', err);
+      res.status(500).json({ success: false, error: err?.message || 'Failed to update treatment in Supabase' });
     }
   });
 
-  // Treatments: DELETE (Admin delete treatment)
+  // Treatments: DELETE (Admin delete treatment from Supabase table treatments)
   app.delete('/api/treatments/:id', async (req, res) => {
     try {
       const { error } = await supabase.from('treatments').delete().eq('id', req.params.id);
       if (error) throw error;
-      treatments = treatments.filter(t => t.id !== req.params.id);
       res.json({ success: true, data: { id: req.params.id } });
-    } catch (err) {
-      console.error('Error deleting treatment in Supabase:', err);
-      // Fallback
-      const index = treatments.findIndex(t => t.id === req.params.id);
-      if (index === -1) return res.status(404).json({ success: false, error: 'Treatment not found' });
-      const deleted = treatments.splice(index, 1);
-      res.json({ success: true, data: deleted[0] });
+    } catch (err: any) {
+      console.error('Error deleting treatment in Supabase treatments table:', err);
+      res.status(500).json({ success: false, error: err?.message || 'Failed to delete treatment from Supabase' });
     }
   });
 

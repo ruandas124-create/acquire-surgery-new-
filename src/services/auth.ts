@@ -288,10 +288,10 @@ export const authService = {
       // ignore
     }
 
-    // If none matched, return helpful feedback instead of a network error
+    // If none matched, return secure feedback
     return { 
       success: false, 
-      error: 'Invalid username or password. Please verify your credentials (e.g. Admin: Acquire@8131).' 
+      error: 'Invalid username or password. Please verify your credentials.' 
     };
   },
 

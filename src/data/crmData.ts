@@ -103,7 +103,7 @@ export const INITIAL_HOSPITAL_ACCOUNTS: HospitalAccount[] = [
     hospitalId: 'hosp-manipal-oar',
     hospitalName: 'Manipal Hospital, Old Airport Road',
     email: 'manipal@acquiresurgery.com',
-    mobile: '+91 94296 93887',
+    mobile: '+91 98449 55100',
     username: 'manipal_desk',
     passwordHash: hashPassword('surgery123'),
     accountStatus: 'Active',
@@ -116,7 +116,7 @@ export const INITIAL_HOSPITAL_ACCOUNTS: HospitalAccount[] = [
     hospitalId: 'hosp-aster-cmi',
     hospitalName: 'Aster CMI Hospital',
     email: 'aster@acquiresurgery.com',
-    mobile: '+91 94296 93887',
+    mobile: '+91 98449 55100',
     username: 'aster_cmi',
     passwordHash: hashPassword('surgery123'),
     accountStatus: 'Active',
@@ -129,7 +129,7 @@ export const INITIAL_HOSPITAL_ACCOUNTS: HospitalAccount[] = [
     hospitalId: 'hosp-narayana-hsr',
     hospitalName: 'Narayana Multispeciality Hospital, HSR',
     email: 'narayana@acquiresurgery.com',
-    mobile: '+91 94296 93887',
+    mobile: '+91 98449 55100',
     username: 'narayana_hsr',
     passwordHash: hashPassword('surgery123'),
     accountStatus: 'Active',
@@ -142,7 +142,7 @@ export const INITIAL_HOSPITAL_ACCOUNTS: HospitalAccount[] = [
     hospitalId: 'hosp-apollo-bannerghatta',
     hospitalName: 'Apollo Hospital, Bannerghatta Road',
     email: 'apollo@acquiresurgery.com',
-    mobile: '+91 94296 93887',
+    mobile: '+91 98449 55100',
     username: 'apollo_bg',
     passwordHash: hashPassword('surgery123'),
     accountStatus: 'Active',
@@ -155,7 +155,7 @@ export const INITIAL_HOSPITAL_ACCOUNTS: HospitalAccount[] = [
     hospitalId: 'hosp-fortis-bg-road',
     hospitalName: 'Fortis Hospital, Bannerghatta Road',
     email: 'fortis@acquiresurgery.com',
-    mobile: '+91 94296 93887',
+    mobile: '+91 98449 55100',
     username: 'fortis_care',
     passwordHash: hashPassword('surgery123'),
     accountStatus: 'Inactive',
@@ -306,7 +306,7 @@ Your hospital access credentials for the *Acquire OPD Partner Portal* have been 
 *Security Reminder:*
 Please log in and update your profile, address details, operating hours, and surgery pricing packages.
 
-For immediate assistance, reach our desk at *+91 94296 93887* or *acquireopd@gmail.com*.
+For immediate assistance, reach our desk at *+91 98449 55100* or *acquireopd@gmail.com*.
 
 Warm regards,
 *Acquire OPD Team*`;

@@ -13,24 +13,17 @@ import {
   AlertCircle, 
   Calendar, 
   Stethoscope, 
-  TrendingUp,
-  BarChart3,
-  DollarSign,
-  Building2,
-  Filter,
-  Check,
-  Clock,
-  ArrowUpRight,
-  ShieldCheck,
-  Plus,
-  Activity,
-  Bed,
-  FileSpreadsheet,
-  Download
+  Filter, 
+  Check, 
+  Clock, 
+  ShieldCheck, 
+  Activity, 
+  FileSpreadsheet, 
+  Download 
 } from 'lucide-react';
 import { LeadsNotesModal } from './LeadsNotesModal';
 import { ManageTreatmentsSection } from './ManageTreatmentsSection';
-import { INITIAL_SCHEDULES, LEAD_SOURCES } from '../../data/crmData';
+import { INITIAL_SCHEDULES } from '../../data/crmData';
 
 interface AdminDashboardProps {
   user: AuthUser;
@@ -43,7 +36,7 @@ const CRM_LEAD_STATUSES: LeadStatus[] = [
   'New Leads', 'RNR', 'Followup', 'Converted', 'Junk'
 ];
 
-type AdminViewTab = 'front-office' | 'doctors' | 'packages' | 'sales' | 'analytics' | 'hospitals';
+type AdminViewTab = 'front-office' | 'treatments';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   user, 
@@ -203,80 +196,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
 
-        {/* HMS Navigation Bar */}
+        {/* Admin Navigation Bar */}
         <div className="bg-[#081528] border-t border-slate-800/90 px-4 sm:px-6 lg:px-8 overflow-x-auto">
-          <div className="max-w-7xl mx-auto flex items-center gap-1 py-1">
-            <button
-              onClick={() => setActiveTab('front-office')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'front-office' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Front Office (Leads &amp; Queue)</span>
-            </button>
+          <div className="max-w-7xl mx-auto flex items-center justify-between py-1.5 gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('front-office')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === 'front-office' 
+                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Front Office (Leads &amp; Queue)</span>
+                {leads.length > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-teal-500/30 text-teal-200 tabular-nums">
+                    {leads.length}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={() => setActiveTab('doctors')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'doctors' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Stethoscope className="w-3.5 h-3.5" />
-              <span>Doctor Dashboard</span>
-            </button>
+              <button
+                onClick={() => setActiveTab('treatments')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === 'treatments' 
+                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>Treatments &amp; Procedures (Supabase)</span>
+              </button>
+            </div>
 
-            <button
-              onClick={() => setActiveTab('packages')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'packages' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <DollarSign className="w-3.5 h-3.5" />
-              <span>Package Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('sales')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'sales' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Sales &amp; Referrals</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'analytics' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Analytic Hub</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('hospitals')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'hospitals' 
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs' 
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Hospital Admin</span>
-            </button>
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-400 shrink-0">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Live DB: <code className="text-teal-300 font-mono bg-slate-800/90 px-1.5 py-0.5 rounded text-[10px] border border-slate-700">treatments.name</code></span>
+            </div>
           </div>
         </div>
       </header>
@@ -478,300 +435,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
         {/* ============================================================== */}
-        {/* TAB 2: DOCTOR DASHBOARD (Specialist queue, consults, OT slots) */}
+        {/* TAB 2: TREATMENTS & PROCEDURES (Supabase treatments table)     */}
         {/* ============================================================== */}
-        {activeTab === 'doctors' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Stethoscope className="w-5 h-5 text-teal-600" />
-                  Doctor Dashboard • Clinical Consultation &amp; OT Queue
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Scheduled specialist evaluations, pre-anesthesia clearances, and surgical admissions across Bangalore hospitals.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500">Active Consults: <strong className="text-slate-900 tabular-nums">{schedules.length}</strong></span>
-              </div>
-            </div>
-
-            {/* Doctor Case Queue Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {schedules.map((item) => (
-                <div key={item.id} className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-3.5">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-sm">{item.patientName}</h3>
-                      <span className="text-xs text-slate-500 font-mono tabular-nums">{item.mobile}</span>
-                    </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                      item.status === 'Confirmed' 
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                        : item.status === 'Scheduled'
-                        ? 'bg-blue-50 text-blue-800 border border-blue-200'
-                        : 'bg-amber-50 text-amber-800 border border-amber-200'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 text-xs border-t border-slate-100 pt-3">
-                    <div className="flex justify-between text-slate-600">
-                      <span>Procedure:</span>
-                      <strong className="text-slate-900">{item.surgeryName}</strong>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Facility:</span>
-                      <span className="text-slate-700 truncate max-w-[180px]">{item.hospitalName}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Appointment:</span>
-                      <span className="text-slate-800 font-semibold tabular-nums">{item.appointmentDate} · {item.preferredTime}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Estimated Range:</span>
-                      <span className="text-teal-700 font-bold tabular-nums">₹{item.minCost.toLocaleString('en-IN')} – ₹{item.maxCost.toLocaleString('en-IN')}</span>
-                    </div>
-                  </div>
-
-                  {item.notes && item.notes.length > 0 && (
-                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/60 text-[11px] text-slate-600">
-                      <span className="font-semibold text-slate-800 block mb-0.5">Clinical Note:</span>
-                      <p className="line-clamp-2 leading-relaxed">{item.notes[0].text}</p>
-                    </div>
-                  )}
-
-                  <div className="pt-1 flex items-center justify-between text-[11px] text-slate-400">
-                    <span>Source: {item.source}</span>
-                    <button 
-                      onClick={() => showToast(`Opening doctor case file for ${item.patientName}`)}
-                      className="text-[#0B1E3B] font-bold hover:underline cursor-pointer"
-                    >
-                      View Case &rarr;
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 3: PACKAGE DASHBOARD (Surgery Pricing & Catalogue) */}
-        {/* ============================================================== */}
-        {activeTab === 'packages' && (
+        {activeTab === 'treatments' && (
           <div className="space-y-6">
             <ManageTreatmentsSection />
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 4: SALES & REFERRALS DASHBOARD (Channel Attribution & Conversion) */}
-        {/* ============================================================== */}
-        {activeTab === 'sales' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-5">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-teal-600" />
-                Sales, Referrals &amp; Inbound Channel Attribution
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Acquisition channels and conversion velocity for surgical admissions in Bangalore network.
-              </p>
-            </div>
-
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Total Inquiries Tracked</span>
-                <span className="text-2xl font-bold text-slate-900 block tabular-nums">{leads.length + schedules.length}</span>
-                <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                  <ArrowUpRight className="w-3.5 h-3.5" /> +18.4% vs previous month
-                </span>
-              </div>
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Qualified Admissions</span>
-                <span className="text-2xl font-bold text-emerald-700 block tabular-nums">
-                  {leads.filter(l => (statusMap[l.status] || l.status) === 'Converted').length + 8}
-                </span>
-                <span className="text-[11px] text-slate-500">Confirmed surgical procedures</span>
-              </div>
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Avg Package Value</span>
-                <span className="text-2xl font-bold text-slate-900 block tabular-nums">₹1,85,000</span>
-                <span className="text-[11px] text-slate-500">Across NABH partner hospitals</span>
-              </div>
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">Cashless Insurance Desk</span>
-                <span className="text-2xl font-bold text-blue-700 block tabular-nums">74.2%</span>
-                <span className="text-[11px] text-slate-500">Pre-authorization claim rate</span>
-              </div>
-            </div>
-
-            {/* Channel Attribution Breakdown */}
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-6 space-y-4">
-              <h3 className="font-bold text-slate-900 text-sm">Inbound Patient Referral Channels</h3>
-              <div className="space-y-3">
-                {LEAD_SOURCES.map((source, idx) => {
-                  const percentages = [38, 24, 14, 10, 8, 4, 2];
-                  const pct = percentages[idx] || 5;
-                  return (
-                    <div key={source} className="space-y-1">
-                      <div className="flex justify-between text-xs font-semibold text-slate-700">
-                        <span>{source}</span>
-                        <span className="tabular-nums font-mono text-slate-900">{pct}%</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-[#0B1E3B] to-teal-600 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 5: ANALYTIC HUB (HMS KPIs, Budget Brackets, Turnaround) */}
-        {/* ============================================================== */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-5">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-teal-600" />
-                Analytic Hub • Hospital Network &amp; Demand Performance
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Real-time operational KPIs, procedure demand distribution, and hospital matching turnaround times.
-              </p>
-            </div>
-
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 block uppercase">Median Coordinator Response Time</span>
-                <span className="text-2xl font-bold text-[#0B1E3B] mt-1 block tabular-nums">14 Minutes</span>
-                <p className="text-xs text-slate-400 mt-1">From initial form submission to first coordinator consultation call.</p>
-              </div>
-
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 block uppercase">Network Hospital Occupancy</span>
-                <span className="text-2xl font-bold text-teal-700 mt-1 block tabular-nums">82.6%</span>
-                <p className="text-xs text-slate-400 mt-1">Aggregated bed availability across all 9 affiliated Bangalore hospitals.</p>
-              </div>
-
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 block uppercase">Patient Satisfaction Score</span>
-                <span className="text-2xl font-bold text-emerald-600 mt-1 block tabular-nums">4.8 / 5.0</span>
-                <p className="text-xs text-slate-400 mt-1">Based on post-admission independent patient feedback.</p>
-              </div>
-            </div>
-
-            {/* Popular Surgeries Distribution */}
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-6 space-y-4">
-              <h3 className="font-bold text-slate-900 text-sm">Top Requested Surgical Procedures</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { name: 'Knee Replacement (Arthroplasty)', pct: 32, count: '68 cases' },
-                  { name: 'Cataract Surgery (Phaco)', pct: 24, count: '51 cases' },
-                  { name: 'Gallbladder Surgery (Lap Chole)', pct: 18, count: '39 cases' },
-                  { name: 'Kidney Stone Surgery (RIRS / PCNL)', pct: 14, count: '30 cases' },
-                  { name: 'Hernia Mesh Repair', pct: 12, count: '25 cases' },
-                ].map(proc => (
-                  <div key={proc.name} className="p-3 rounded-lg border border-slate-100 bg-slate-50/50 space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold text-slate-800">
-                      <span>{proc.name}</span>
-                      <span className="text-teal-700 tabular-nums">{proc.count} ({proc.pct}%)</span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#0B1E3B] h-full rounded-full" style={{ width: `${proc.pct * 2}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 6: HOSPITAL ADMIN (Affiliated Hospitals Directory) */}
-        {/* ============================================================== */}
-        {activeTab === 'hospitals' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-teal-600" />
-                  Hospital Partner Network &amp; Facility Directory
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Accredited hospital partners in Bangalore integrated into Acquire Surgery matching engine.
-                </p>
-              </div>
-              <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                {hospitals.length} Verified Partner Hospitals
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {hospitals.map(hosp => (
-                <div key={hosp.id} className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col justify-between">
-                  <div className="p-5 space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 block">
-                          {hosp.category}
-                        </span>
-                        <h3 className="font-bold text-slate-900 text-sm leading-snug">{hosp.name}</h3>
-                      </div>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                        NABH Verified
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                      {hosp.description || 'Premier surgical care institution in Bangalore with modular OTs and cashless TPA desks.'}
-                    </p>
-
-                    <div className="space-y-1 text-xs text-slate-600 pt-1 border-t border-slate-100">
-                      <div className="flex justify-between">
-                        <span>Zone:</span>
-                        <strong className="text-slate-800">{hosp.location}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Bed Capacity:</span>
-                        <span className="text-slate-800 font-mono tabular-nums">{hosp.bedCount} Beds</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Helpline:</span>
-                        <span className="text-slate-700 font-mono tabular-nums">{hosp.phone}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500">
-                      {hosp.treatmentEstimates?.length || 0} Surgery Packages
-                    </span>
-                    {onSwitchToHospital && (
-                      <button
-                        onClick={() => onSwitchToHospital(hosp.id)}
-                        className="text-xs font-bold text-[#0B1E3B] hover:text-teal-700 cursor-pointer inline-flex items-center gap-1"
-                      >
-                        <span>Login as Partner</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 

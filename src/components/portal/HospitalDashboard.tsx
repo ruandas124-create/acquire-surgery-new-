@@ -77,7 +77,7 @@ export const HospitalDashboard: React.FC<HospitalDashboardProps> = ({
   const [hospitalName, setHospitalName] = useState(hospital?.name || '');
   const [imageUrl, setImageUrl] = useState(hospital?.imageUrl || '');
   const [registrationNumber, setRegistrationNumber] = useState(hospital?.registrationNumber || 'REG-KA-2018-09412');
-  const [mobileNumber, setMobileNumber] = useState(hospital?.mobile || hospital?.phone || '+91 94296 93887');
+  const [mobileNumber, setMobileNumber] = useState(hospital?.mobile || hospital?.phone || '+91 98449 55100');
   const [emailAddress, setEmailAddress] = useState(hospital?.email || user.email || 'acquireopd@gmail.com');
   const [category, setCategory] = useState(hospital?.category || 'Standard Hospital');
   const [description, setDescription] = useState(hospital?.description || '');
@@ -131,7 +131,7 @@ export const HospitalDashboard: React.FC<HospitalDashboardProps> = ({
       setHospitalName(hospital.name);
       setImageUrl(hospital.imageUrl || '');
       setRegistrationNumber(hospital.registrationNumber || 'REG-KA-2018-09412');
-      setMobileNumber(hospital.mobile || hospital.phone || '+91 94296 93887');
+      setMobileNumber(hospital.mobile || hospital.phone || '+91 98449 55100');
       setEmailAddress(hospital.email || user.email || 'acquireopd@gmail.com');
       setCategory(hospital.category);
       setDescription(hospital.description || '');
@@ -608,7 +608,7 @@ export const HospitalDashboard: React.FC<HospitalDashboardProps> = ({
                       required
                       value={mobileNumber}
                       onChange={(e) => setMobileNumber(e.target.value)}
-                      placeholder="+91 94296 93887"
+                      placeholder="+91 98449 55100"
                       className="w-full pl-9 pr-3.5 py-2.5 text-xs font-medium border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#062B61] focus:border-[#062B61] bg-white"
                     />
                   </div>

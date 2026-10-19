@@ -239,7 +239,7 @@ export const HowItWorksPage: React.FC<HowItWorksPageProps> = ({
               className="px-6 py-3 bg-white/15 hover:bg-white/25 text-white font-bold text-sm rounded-xl border border-white/20 cursor-pointer flex items-center justify-center gap-2"
             >
               <Phone className="w-4 h-4 text-emerald-300 shrink-0" />
-              <span>Talk to Our Team <span className="whitespace-nowrap font-bold">(+91&nbsp;94296&nbsp;93887)</span></span>
+              <span>Talk to Our Team <span className="whitespace-nowrap font-bold">(+91&nbsp;98449&nbsp;55100)</span></span>
             </button>
           </div>
         </div>

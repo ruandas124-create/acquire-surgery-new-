@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { SearchCriteria } from '../types';
 import { api } from '../services/api';
+import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 import { 
   Search, 
   MapPin, 
@@ -26,24 +27,6 @@ interface HospitalMatchingModalProps {
   initialCriteria?: Partial<SearchCriteria>;
   submissionError?: string | null;
 }
-
-const COMMON_TREATMENTS = [
-  'Knee Replacement',
-  'Cataract Surgery',
-  'Gallbladder Surgery',
-  'Hernia Surgery',
-  'Kidney Stone Surgery',
-  'Heart Surgery (Bypass / Stent)',
-  'Appendectomy',
-  'Hip Replacement',
-  'Hysterectomy (Gynae Surgery)',
-  'Piles / Fissure / Fistula',
-  'ACL Reconstruction (Arthroscopy)',
-  'Spine Surgery / Slip Disc',
-  'IVF & Fertility Treatment',
-  'Thyroid Surgery',
-  'Other Surgical Treatment'
-];
 
 const BUDGET_TIERS = [
   'Below ₹50,000',
@@ -74,7 +57,7 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
 }) => {
   const [name, setName] = useState(initialCriteria?.name || '');
   const [mobile, setMobile] = useState(initialCriteria?.mobile || '');
-  const [treatment, setTreatment] = useState(initialCriteria?.treatment || 'Knee Replacement');
+  const [treatment, setTreatment] = useState(initialCriteria?.treatment || '');
   const [treatmentQuery, setTreatmentQuery] = useState(initialCriteria?.treatment || '');
   const [isTreatmentOpen, setIsTreatmentOpen] = useState(false);
   const [location, setLocation] = useState(initialCriteria?.city || 'Bangalore (All Zones)');
@@ -93,29 +76,73 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
   const [isTreatmentsLoading, setIsTreatmentsLoading] = useState(false);
   const [treatmentsError, setTreatmentsError] = useState<string | null>(null);
 
-  // Load dynamic treatments from API / Database
-  useEffect(() => {
-    async function fetchTreatments() {
-      setIsTreatmentsLoading(true);
-      setTreatmentsError(null);
-      try {
+  // Load dynamic treatments directly from Supabase (treatments table, name column)
+  const fetchTreatments = useCallback(async () => {
+    setIsTreatmentsLoading(true);
+    setTreatmentsError(null);
+    try {
+      let treatmentNames: string[] = [];
+
+      // Primary: Query Supabase treatments table directly for the 'name' column
+      if (isSupabaseConfigured && supabase) {
+        const { data, error } = await supabase
+          .from('treatments')
+          .select('name')
+          .order('name', { ascending: true });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && Array.isArray(data)) {
+          treatmentNames = data
+            .map((item: any) => (typeof item?.name === 'string' ? item.name.trim() : ''))
+            .filter((n: string) => n.length > 0);
+        }
+      } else {
+        // Fallback to API service if Supabase client is not configured
         const list = await api.getTreatments();
         if (Array.isArray(list)) {
-          // Extract names, ensure unique, filter out empty strings
-          const uniqueNames = Array.from(new Set(list.map(t => t.name).filter(n => n && n.trim() !== '')));
-          setTreatmentsList(uniqueNames);
+          treatmentNames = list
+            .map((t: any) => (typeof t?.name === 'string' ? t.name.trim() : ''))
+            .filter((n: string) => n.length > 0);
         }
-      } catch (err) {
-        console.error('Failed to load dynamic treatments list', err);
-        setTreatmentsError('Could not load treatment options.');
-      } finally {
-        setIsTreatmentsLoading(false);
       }
+
+      // Prevent duplicate options if duplicate treatment names exist without modifying DB records
+      const uniqueNames = Array.from(new Set(treatmentNames));
+      setTreatmentsList(uniqueNames);
+    } catch (err: any) {
+      console.error('Failed to load dynamic treatments list from Supabase:', err);
+      // Fallback to API endpoint if direct client query fails
+      try {
+        const list = await api.getTreatments();
+        if (Array.isArray(list) && list.length > 0) {
+          const uniqueNames = Array.from(
+            new Set(
+              list
+                .map((t: any) => (typeof t?.name === 'string' ? t.name.trim() : ''))
+                .filter((n: string) => n.length > 0)
+            )
+          );
+          setTreatmentsList(uniqueNames);
+          return;
+        }
+      } catch {
+        // Fallback also failed
+      }
+      setTreatmentsError(err?.message || 'Could not load treatment options from Supabase database.');
+    } finally {
+      setIsTreatmentsLoading(false);
     }
+  }, []);
+
+  // Fetch treatments dynamically whenever the popup opens
+  useEffect(() => {
     if (isOpen) {
-        fetchTreatments();
+      fetchTreatments();
     }
-  }, [isOpen]);
+  }, [isOpen, fetchTreatments]);
 
   // Sync initial criteria when opened
   useEffect(() => {
@@ -223,9 +250,12 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
     });
   };
 
-  const filteredTreatments = treatmentsList.filter(t =>
-    t.toLowerCase().includes(treatmentQuery.toLowerCase())
-  );
+  const filteredTreatments =
+    !treatmentQuery.trim() || treatmentQuery.trim().toLowerCase() === treatment.trim().toLowerCase()
+      ? treatmentsList
+      : treatmentsList.filter(t =>
+          t.toLowerCase().includes(treatmentQuery.trim().toLowerCase())
+        );
 
   return (
     <AnimatePresence>
@@ -371,12 +401,38 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
 
                   {/* Dropdown Menu */}
                   {isTreatmentOpen && (
-                    <div className="absolute z-40 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-56 overflow-y-auto py-1.5">
+                    <div 
+                      id="treatment-dropdown-menu"
+                      className="absolute z-40 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-56 overflow-y-auto py-1.5 divide-y divide-slate-100/60"
+                    >
                       {isTreatmentsLoading ? (
-                        <div className="p-3 text-xs text-slate-500">Loading options...</div>
+                        <div className="p-4 text-xs text-slate-500 flex items-center justify-center gap-2.5">
+                          <div className="w-4 h-4 border-2 border-[#0A3B75] border-t-transparent rounded-full animate-spin shrink-0" />
+                          <span>Loading treatment procedures from database...</span>
+                        </div>
                       ) : treatmentsError ? (
-                        <div className="p-3 text-xs text-rose-600 flex items-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5" /> {treatmentsError}
+                        <div className="p-3.5 text-xs text-rose-600 flex items-start justify-between gap-2 bg-rose-50/70 m-1.5 rounded-xl border border-rose-200">
+                          <div className="flex items-start gap-1.5">
+                            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                            <div>
+                              <p className="font-semibold text-rose-800">Database Error</p>
+                              <p className="text-[11px] text-rose-600 mt-0.5">{treatmentsError}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              fetchTreatments();
+                            }}
+                            className="text-xs font-bold underline text-[#0A3B75] hover:text-[#062B61] shrink-0 cursor-pointer"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      ) : treatmentsList.length === 0 ? (
+                        <div className="p-4 text-xs text-slate-500 text-center">
+                          No treatments available in database. You can type your required procedure above.
                         </div>
                       ) : filteredTreatments.length > 0 ? (
                         filteredTreatments.map((t) => (
@@ -389,17 +445,17 @@ export const HospitalMatchingModal: React.FC<HospitalMatchingModalProps> = ({
                               setIsTreatmentOpen(false);
                               if (errors.treatment) setErrors(prev => ({ ...prev, treatment: '' }));
                             }}
-                            className={`w-full text-left px-4 py-2 text-xs sm:text-sm flex items-center justify-between hover:bg-blue-50 transition-colors cursor-pointer ${
-                              treatment === t ? 'bg-blue-50 font-bold text-[#0A3B75]' : 'text-slate-700'
+                            className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm flex items-center justify-between hover:bg-blue-50 transition-colors cursor-pointer ${
+                              treatment === t ? 'bg-blue-50/90 font-bold text-[#0A3B75]' : 'text-slate-700'
                             }`}
                           >
                             <span>{t}</span>
-                            {treatment === t && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                            {treatment === t && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                           </button>
                         ))
                       ) : (
-                        <div className="p-3 text-xs text-slate-500">
-                          Press tab or click outside to use &ldquo;{treatmentQuery}&rdquo; as a custom procedure.
+                        <div className="p-3.5 text-xs text-slate-500">
+                          No procedures found matching &ldquo;{treatmentQuery}&rdquo;. Press Enter or click outside to use as custom procedure.
                         </div>
                       )}
                     </div>

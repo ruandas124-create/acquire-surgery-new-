@@ -59,11 +59,11 @@ export const PersonalSupportBanner: React.FC<PersonalSupportBannerProps> = ({
               </motion.button>
 
               <a
-                href="tel:+919429693887"
+                href="tel:+919844955100"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-white transition-colors"
               >
                 <span>Or call direct:</span>
-                <span className="font-bold underline text-emerald-300 whitespace-nowrap">+91&nbsp;94296&nbsp;93887</span>
+                <span className="font-bold underline text-emerald-300 whitespace-nowrap">+91&nbsp;98449&nbsp;55100</span>
               </a>
             </div>
           </div>
