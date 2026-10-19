@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthUser, Hospital } from '../../types';
-import { authService, REGISTERED_ACCOUNTS } from '../../services/auth';
+import { authService } from '../../services/auth';
 import { 
   ShieldCheck, 
   Lock, 
@@ -8,12 +8,9 @@ import {
   Eye, 
   EyeOff, 
   ArrowRight, 
-  Building2, 
-  UserCheck, 
   AlertCircle,
   X,
-  Sparkles,
-  KeyRound
+  Stethoscope
 } from 'lucide-react';
 import { Logo } from '../Logo';
 
@@ -39,12 +36,12 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
     setErrorMessage('');
 
     if (!email.trim()) {
-      setErrorMessage('Please enter your email address');
+      setErrorMessage('Please enter your administrator or hospital partner email address');
       return;
     }
 
     if (!password.trim()) {
-      setErrorMessage('Please enter your password');
+      setErrorMessage('Please enter your account password');
       return;
     }
 
@@ -56,93 +53,88 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
     if (result.success && result.user) {
       onLoginSuccess(result.user);
     } else {
-      setErrorMessage(result.error || 'Authentication failed. Please check your credentials.');
+      setErrorMessage(result.error || 'Invalid credentials. Please verify your email and password.');
     }
   };
 
-  const handleQuickSelectEmail = (sampleEmail: string, samplePassword?: string) => {
-    setEmail(sampleEmail);
-    setPassword(samplePassword || 'Acquire@8131');
-    setErrorMessage('');
-  };
-
   return (
-    <div id="acquire-portal-login" className="min-h-[80vh] flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
+    <div id="acquire-portal-login" className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
       <div className="w-full max-w-md">
         {/* Main Card */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-br from-[#062B61] via-[#0A3B75] to-[#041d42] p-7 text-white text-center relative">
+          <div className="bg-[#0B1E3B] p-8 text-white text-center relative border-b border-slate-800">
             <button
               onClick={onCancel}
-              className="absolute top-5 right-5 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
               title="Return to Public Website"
+              aria-label="Close login dialog"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex justify-center mb-3">
-              <div className="bg-white px-3 py-1.5 rounded-xl shadow-xs inline-block">
+              <div className="bg-white px-3 py-1.5 rounded-lg shadow-sm inline-block">
                 <Logo size="sm" showTagline={false} />
               </div>
             </div>
 
-            <h1 className="text-xl font-extrabold tracking-tight">Portal Sign In</h1>
-            <p className="text-xs text-slate-300 mt-1 max-w-xs mx-auto">
-              Enter your email and password to access your Admin or Hospital Partner dashboard.
+            <h1 className="text-xl font-bold tracking-tight text-white">Healthcare Portal Login</h1>
+            <p className="text-xs text-slate-300 mt-1.5 max-w-xs mx-auto">
+              Secure authentication for Master Admin, Care Coordinators &amp; Hospital Partners.
             </p>
 
-            <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-400/30">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Encrypted Healthcare Authentication</span>
+            <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/15 text-teal-300 text-[11px] font-semibold border border-teal-500/30">
+              <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
+              <span>Encrypted Healthcare Management System</span>
             </div>
           </div>
 
-          {/* Form: Email & Password Only */}
-          <div className="p-6 sm:p-7 space-y-5">
+          {/* Form */}
+          <div className="p-6 sm:p-8 space-y-5">
             {errorMessage && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{errorMessage}</span>
+                <span className="font-medium">{errorMessage}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* 1. Username or Email Address Input */}
+              {/* Username / Email */}
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Username or Email Address
+                  Work Email or Username
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
                     autoFocus
                     autoComplete="username"
-                    placeholder="e.g. admin or manipal_desk or email"
+                    placeholder="e.g. Admin@acquire.com or hospital_admin"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
                       if (errorMessage) setErrorMessage('');
                     }}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#062B61] focus:border-[#062B61] transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#0B1E3B] focus:border-[#0B1E3B] transition-all bg-slate-50/50 focus:bg-white"
                   />
                 </div>
               </div>
 
-              {/* 2. Password Input */}
+              {/* Password */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-700 block">
                     Password
                   </label>
                   <span className="text-[11px] text-slate-400 font-medium">
-                    (Admin: Acquire@8131)
+                    (Master Admin: Acquire@8131)
                   </span>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -153,51 +145,83 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
                       setPassword(e.target.value);
                       if (errorMessage) setErrorMessage('');
                     }}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#062B61] focus:border-[#062B61] transition-all"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-[#0B1E3B] focus:border-[#0B1E3B] transition-all bg-slate-50/50 focus:bg-white"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit CTA */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#062B61] to-[#0A3B75] hover:from-[#052452] hover:to-[#093567] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                className="w-full mt-3 py-3 px-4 rounded-xl bg-[#0B1E3B] hover:bg-[#081528] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 active:scale-[0.99]"
               >
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Signing in...</span>
+                    <span>Authenticating...</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>Sign In to Healthcare Portal</span>
+                    <ArrowRight className="w-4 h-4 text-teal-300" />
                   </>
                 )}
               </button>
             </form>
 
+            {/* Quick Demo Access Pills */}
+            <div className="pt-3 border-t border-slate-100 text-center">
+              <span className="text-[11px] text-slate-400 block mb-2 font-medium">Quick Credentials for Testing:</span>
+              <div className="flex flex-wrap justify-center gap-1.5 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('Admin@acquire.com');
+                    setPassword('Acquire@8131');
+                  }}
+                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold cursor-pointer transition-colors"
+                >
+                  Admin (Acquire@8131)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('manipal@acquiresurgery.com');
+                    setPassword('surgery123');
+                  }}
+                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold cursor-pointer transition-colors"
+                >
+                  Hospital Partner
+                </button>
+              </div>
+            </div>
 
-
-            {/* Cancel / Return */}
-            <div className="text-center pt-2">
+            {/* Return Link */}
+            <div className="text-center pt-1">
               <button
                 type="button"
                 onClick={onCancel}
-                className="text-xs text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer"
+                className="text-xs text-slate-500 hover:text-[#0B1E3B] font-medium transition-colors cursor-pointer"
               >
-                &larr; Back to Acquire SURGERY Website
+                &larr; Return to Patient Website
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Security Footer Note */}
+        <div className="text-center mt-4 text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+          <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
+          <span>Acquire Surgery Hospital Management System • Bangalore Network</span>
         </div>
       </div>
     </div>

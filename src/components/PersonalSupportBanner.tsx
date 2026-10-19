@@ -63,7 +63,7 @@ export const PersonalSupportBanner: React.FC<PersonalSupportBannerProps> = ({
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-white transition-colors"
               >
                 <span>Or call direct:</span>
-                <span className="font-bold underline text-emerald-300">+91 94296 93887</span>
+                <span className="font-bold underline text-emerald-300 whitespace-nowrap">+91&nbsp;94296&nbsp;93887</span>
               </a>
             </div>
           </div>

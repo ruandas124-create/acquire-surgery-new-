@@ -14,7 +14,7 @@ export const TreatmentsPage: React.FC<TreatmentsPageProps> = ({
   onSelectTreatment,
 }) => {
   return (
-    <div id="treatments-page-container" className="bg-slate-50/50 min-h-[85vh]">
+    <div id="treatments-page-container" className="bg-slate-50/50 min-h-[85vh] pb-24 sm:pb-28">
       <CostGuideView
         treatments={treatments}
         hospitals={hospitals}

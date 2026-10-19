@@ -411,66 +411,73 @@ export const HospitalDashboard: React.FC<HospitalDashboardProps> = ({
   };
 
   return (
-    <div id="acquire-hospital-crm" className="min-h-screen bg-slate-100 flex flex-col">
-      {/* Top Professional Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Logo size="sm" showTagline={false} />
-            <div className="h-6 w-px bg-slate-200 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#062B61] text-white">
-                Hospital Partner Portal
-              </span>
-              <span className="text-xs text-slate-500 font-semibold hidden md:inline">
-                {hospital.name}
+    <div id="acquire-hospital-crm" className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-800">
+      {/* Enterprise HMS Hospital Top Header */}
+      <header className="bg-[#0B1E3B] text-white sticky top-0 z-30 shadow-sm border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-white px-2.5 py-1 rounded-md shadow-xs">
+              <Logo size="sm" showTagline={false} />
+            </div>
+            <div className="hidden sm:block">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white tracking-wide uppercase flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-teal-400" />
+                  Hospital Partner Management Console
+                </span>
+              </div>
+              <span className="text-[10px] text-teal-300 block font-semibold truncate max-w-sm">
+                {hospital.name} • {hospital.location} Campus
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-bold text-slate-800">{user.name}</div>
-              <div className="text-[11px] text-slate-500">{hospital.location} Desk</div>
+              <div className="text-xs font-bold text-white">{user.name}</div>
+              <div className="text-[10px] text-slate-400">{hospital.location} Desk • Partner ID: {hospital.id}</div>
             </div>
 
             <button
               onClick={onLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 hover:text-white transition-colors cursor-pointer border border-slate-700"
+              title="Sign out of Hospital Portal"
             >
-              <LogOut className="w-3.5 h-3.5 text-slate-500" />
-              <span>Sign Out</span>
+              <LogOut className="w-3.5 h-3.5 text-slate-400" />
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-1 border-t border-slate-100 no-scrollbar">
-          {[
-            { id: 'profile', label: 'Hospital Profile & Address', icon: Building2 },
-            { id: 'hours', label: 'Operating Hours', icon: Clock },
-            { id: 'surgeries', label: `Surgery & Treatments (${surgeries.length})`, icon: FileText },
-            { id: 'leads', label: `Patient Inquiries (${leads.length})`, icon: Users },
-            { id: 'capacity', label: 'Capacity & TPA Desk', icon: Bed },
-            { id: 'security', label: 'Change Password', icon: KeyRound },
-          ].map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-                  isActive
-                    ? 'border-[#062B61] text-[#062B61] bg-blue-50/50'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#062B61]' : 'text-slate-400'}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        <div className="bg-[#081528] border-t border-slate-800/90 px-4 sm:px-6 lg:px-8 overflow-x-auto">
+          <div className="max-w-7xl mx-auto flex items-center gap-1 py-1">
+            {[
+              { id: 'profile', label: 'Hospital Profile & Campus', icon: Building2 },
+              { id: 'hours', label: 'Operating & OPD Hours', icon: Clock },
+              { id: 'surgeries', label: `Surgery Packages (${surgeries.length})`, icon: FileText },
+              { id: 'leads', label: `Patient Referrals (${leads.length})`, icon: Users },
+              { id: 'capacity', label: 'OT & Bed Capacity', icon: Bed },
+              { id: 'security', label: 'Account Security', icon: KeyRound },
+            ].map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-teal-400' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </header>
 

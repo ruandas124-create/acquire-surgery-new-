@@ -12,6 +12,7 @@ import { HowItWorksPage } from './pages/HowItWorksPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminPortal } from './components/AdminPortal';
+import { TreatmentFloatingContactBar } from './components/TreatmentFloatingContactBar';
 import { Hospital, SearchCriteria, TreatmentInfo } from './types';
 import { api } from './services/api';
 
@@ -303,6 +304,9 @@ export function App() {
         onNavigate={navigateTo}
         onOpenAdmin={() => navigateTo('admin')}
       />
+
+      {/* Floating Bottom Contact Bar: CALL NOW & WHATSAPP (Public Patient & Treatment Pages) */}
+      {activeView !== 'admin' && <TreatmentFloatingContactBar />}
 
       {/* Confirmation Modal */}
       <ConfirmationModal
