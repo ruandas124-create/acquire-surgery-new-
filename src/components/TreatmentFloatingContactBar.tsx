@@ -20,7 +20,7 @@ export const TreatmentFloatingContactBar: React.FC<TreatmentFloatingContactBarPr
     <aside
       id="treatment-floating-contact-bar"
       aria-label="Direct Patient Contact Desk"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] px-3 sm:px-6 py-2.5 sm:py-3 transition-transform"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] px-3 sm:px-6 py-2.5 sm:py-3 transition-transform"
     >
       <div className="max-w-md sm:max-w-lg mx-auto w-full grid grid-cols-2 gap-2.5 sm:gap-3">
         {/* 1. CALL NOW - White with purple border, purple phone icon, purple text */}

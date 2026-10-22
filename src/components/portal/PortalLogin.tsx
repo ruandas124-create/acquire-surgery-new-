@@ -10,7 +10,8 @@ import {
   ArrowRight, 
   AlertCircle,
   X,
-  Stethoscope
+  Stethoscope,
+  MapPin
 } from 'lucide-react';
 import { Logo } from '../Logo';
 
@@ -189,9 +190,15 @@ export const PortalLogin: React.FC<PortalLoginProps> = ({
         </div>
 
         {/* Security Footer Note */}
-        <div className="text-center mt-4 text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
-          <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-          <span>Acquire Surgery Hospital Management System • Bangalore Network</span>
+        <div className="text-center mt-5 text-[11px] text-slate-500 space-y-1">
+          <div className="flex items-center justify-center gap-1.5 font-semibold text-slate-700">
+            <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
+            <span>Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.</span>
+          </div>
+          <div className="flex items-center justify-center gap-1 text-[10px] text-slate-500">
+            <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+            <span>No. 7, 1st Floor, 8th Main, 4th Cross, S.L.V Indl Area, Peenya 2nd Stage, Bangalore – 560058</span>
+          </div>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
   return (
-    <footer id="site-footer" className="bg-[#0A192F] text-slate-300 pt-16 pb-28 sm:pb-32 border-t border-slate-800/80">
+    <footer id="site-footer" className="bg-[#0A192F] text-slate-300 pt-16 pb-28 md:pb-16 border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 mb-12">
           {/* Brand & Healthcare Mission */}
@@ -17,6 +17,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
             <Logo size="md" variant="white" showTagline={false} />
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
               Acquire Surgery is Bangalore&apos;s independent healthcare decision support platform. We connect patients with accredited surgical hospitals matching their clinical requirements and indicative budget.
+            </p>
+            <p className="text-xs text-teal-300 font-medium leading-relaxed">
+              Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.
             </p>
             <div className="flex flex-wrap items-center gap-3 text-xs text-teal-400 font-semibold pt-1">
               <span className="flex items-center gap-1.5">
@@ -128,9 +131,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
                   <MapPin className="w-4 h-4 text-slate-300" />
                 </div>
                 <div>
-                  <span className="block text-[11px] text-slate-400">Bangalore Center</span>
-                  <span className="text-slate-300 text-xs">
-                    12th Main Rd, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038
+                  <span className="block text-[11px] text-slate-400 font-semibold">Sulegai Mobile Apps Pvt Ltd</span>
+                  <span className="text-slate-300 text-xs leading-relaxed block">
+                    No. 7, 1st Floor, 8th Main, 4th Cross, S.L.V Indl Area, Peenya 2nd Stage, Bangalore – 560058
                   </span>
                 </div>
               </div>
@@ -147,12 +150,22 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
         </div>
 
         {/* Clean Bottom Copyright Bar - NO duplicate Admin Login button here */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 pt-5 border-t border-slate-800/80">
-          <div>
-            &copy; {new Date().getFullYear()} Acquire Surgery. All rights reserved. Registered healthcare decision support in Bengaluru, Karnataka.
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 pt-5 border-t border-slate-800/80">
+          <div className="space-y-1 text-center sm:text-left">
+            <div>
+              &copy; {new Date().getFullYear()} Acquire Surgery. All rights reserved.
+            </div>
+            <div className="text-slate-400 text-[11px] font-medium">
+              Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-slate-500 text-[11px]">
-            <span>Privacy Policy</span>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 text-slate-500 text-[11px]">
+            <button
+              onClick={() => onNavigate('privacy')}
+              className="text-slate-400 hover:text-teal-300 transition-colors cursor-pointer underline-offset-2 hover:underline"
+            >
+              Privacy Policy
+            </button>
             <span>·</span>
             <span>Terms of Assistance</span>
             <span>·</span>

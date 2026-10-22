@@ -11,6 +11,7 @@ import { TreatmentsPage } from './pages/TreatmentsPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { AdminPortal } from './components/AdminPortal';
 import { TreatmentFloatingContactBar } from './components/TreatmentFloatingContactBar';
 import { Hospital, SearchCriteria, TreatmentInfo } from './types';
@@ -78,6 +79,7 @@ export function App() {
       'how-it-works': 'How Acquire Surgery Works - Patient Decision Support',
       about: 'About Acquire Surgery - Transparent Healthcare in Bangalore',
       contact: 'Contact Patient Coordinator - Acquire Surgery Bangalore Helpline',
+      privacy: 'Privacy Policy - Acquire Surgery | Sulegai Mobile Apps Private Limited',
       admin: 'Coordinator Admin Portal - Acquire Surgery Bangalore',
     };
 
@@ -86,7 +88,7 @@ export function App() {
     }
   }, [activeView]);
 
-  // Check URL hash or query params so admins and hospital staff can navigate directly (e.g. #admin, #portal)
+  // Check URL hash or query params so admins and hospital staff can navigate directly (e.g. #admin, #portal, #privacy)
   useEffect(() => {
     const checkHashOrQuery = () => {
       if (typeof window === 'undefined') return;
@@ -94,6 +96,8 @@ export function App() {
       const params = new URLSearchParams(window.location.search);
       if (hash === 'admin' || hash === 'portal' || hash === 'login' || params.has('admin') || params.has('portal')) {
         setActiveView('admin');
+      } else if (hash === 'privacy' || params.has('privacy')) {
+        setActiveView('privacy');
       }
     };
     checkHashOrQuery();
@@ -293,7 +297,15 @@ export function App() {
           <ContactPage />
         )}
 
-        {/* 8. ADMIN & LEAD MANAGEMENT PORTAL */}
+        {/* 8. PRIVACY POLICY PAGE */}
+        {activeView === 'privacy' && (
+          <PrivacyPolicyPage
+            onBackToHome={() => navigateTo('home')}
+            onContactClick={() => navigateTo('contact')}
+          />
+        )}
+
+        {/* 9. ADMIN & LEAD MANAGEMENT PORTAL */}
         {activeView === 'admin' && (
           <AdminPortal onClose={() => navigateTo('home')} />
         )}

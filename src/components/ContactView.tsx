@@ -80,10 +80,14 @@ export const ContactView: React.FC = () => {
               <MapPin className="w-6 h-6 text-slate-700" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-900">Bangalore Office</h4>
+              <h4 className="text-sm font-bold text-slate-900">Sulegai Mobile Apps Pvt Ltd</h4>
               <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                12th Main Rd, HAL 2nd Stage, Indiranagar,<br />
-                Bengaluru, Karnataka 560038
+                No. 7, 1st Floor, 8th Main, 4th Cross,<br />
+                S.L.V Indl Area, Peenya 2nd Stage,<br />
+                Bangalore – 560058
+              </p>
+              <p className="text-[11px] text-teal-800 font-semibold mt-1">
+                Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.
               </p>
             </div>
           </div>

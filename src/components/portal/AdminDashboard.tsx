@@ -19,7 +19,8 @@ import {
   ShieldCheck, 
   Activity, 
   FileSpreadsheet, 
-  Download 
+  Download,
+  MapPin 
 } from 'lucide-react';
 import { LeadsNotesModal } from './LeadsNotesModal';
 import { ManageTreatmentsSection } from './ManageTreatmentsSection';
@@ -444,6 +445,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
       </main>
+
+      {/* Enterprise / Corporate Details Footer */}
+      <footer className="mt-auto border-t border-slate-200 bg-white py-4 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <span className="font-bold text-slate-800">Sulegai Mobile Apps Pvt Ltd</span>
+            <span className="text-slate-300">|</span>
+            <span className="text-slate-600">Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.</span>
+          </div>
+          <div className="flex items-center justify-center gap-1.5 text-slate-600">
+            <MapPin className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+            <span>No. 7, 1st Floor, 8th Main, 4th Cross, S.L.V Indl Area, Peenya 2nd Stage, Bangalore – 560058</span>
+          </div>
+        </div>
+      </footer>
 
       {/* Leads Notes Modal */}
       {leadNotesModalTarget && (

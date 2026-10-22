@@ -128,9 +128,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({
         <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl font-bold text-slate-900">Acquire Surgery Bangalore Operations</h3>
+            <p className="text-xs text-teal-800 font-semibold bg-teal-50 px-2.5 py-1 rounded-md inline-block">
+              Acquire Surgery is a subsidiary of Sulegai Mobile Apps Private Limited.
+            </p>
             <p className="text-xs sm:text-sm text-slate-600 flex items-center justify-center md:justify-start gap-1.5">
-              <MapPin className="w-4 h-4 text-[#0A3B75]" />
-              <span>100 Feet Road, Indiranagar, Bangalore 560038, Karnataka, India</span>
+              <MapPin className="w-4 h-4 text-[#0A3B75] shrink-0" />
+              <span>No. 7, 1st Floor, 8th Main, 4th Cross, S.L.V Indl Area, Peenya 2nd Stage, Bangalore – 560058</span>
             </p>
             <p className="text-xs sm:text-sm text-slate-600 flex items-center justify-center md:justify-start gap-1.5">
               <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
